@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Citizen Portal — SurakshaNER</title>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#14201b">
+</head>
+<body class="page-home">
+  <script>window.NAV_BASE = '../'; window.NAV_CURRENT = 'citizen';</script>
+  <div id="site-navbar"></div>
+  <div id="citizen-alert-banner"></div>
+
+  <section class="hero" style="padding-bottom: 24px;">
+    <div class="hero-eyebrow">CITIZEN ALERT PORTAL</div>
+    <h1 style="font-size: 26px;">Report an emergency or send an SOS</h1>
+    <p>Your location is sent automatically with every alert.</p>
+    <div class="hero-ctas" style="margin-top: 16px;">
+      <button class="cta-primary open-emergency-modal">Emergency Services</button>
+      <button id="in-danger-btn" class="in-danger-btn">IN DANGER</button>
+    </div>
+  </section>
+
+  <div class="citizen-grid" style="max-width: 1100px; margin: 0 auto; padding: 0 24px 20px;">
+    <div class="panel">
+      <h2>Send SOS</h2>
+      <div class="form-group">
+        <label style="color:#9fb3a8; font-family:'Space Grotesk',sans-serif; font-size:13px;">Number of people needing help</label>
+        <input type="number" id="victimCount" value="1" min="1"
+          style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;">
+      </div>
+      <div class="form-group" style="margin-top:14px;">
+        <label style="color:#9fb3a8; font-family:'Space Grotesk',sans-serif; font-size:13px;">Anyone elderly, disabled, or needing medical attention?</label>
+        <select id="vulnerability"
+          style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;">
+          <option value="none">No</option>
+          <option value="elderly">Elderly person</option>
+          <option value="disabled">Person with disability</option>
+          <option value="medical">Medical emergency</option>
+          <option value="child">Young child</option>
+        </select>
+      </div>
+      <button class="sos-btn" id="sosBtn" onclick="sendSOS()" style="margin-top:20px;">SEND SOS ALERT</button>
+      <div id="status" style="color:#9fb3a8; text-align:center; margin-top:10px;"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Announcements</h2>
+      <div id="announcements">Loading...</div>
+    </div>
+  </div>
+
+  
+  <div class="citizen-grid">
+  <div class="panel" id="reportHazardSection">
+    <h2>REPORT A HAZARD</h2>
+    <div class="form-group">
+      <label style="color:#9fb3a8; font-family:'Space Grotesk',sans-serif; font-size:13px;">What are you seeing?</label>
+      <div id="hazardButtons" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+        <button type="button" class="hazard-btn" data-hazard="crack">Crack</button>
+        <button type="button" class="hazard-btn" data-hazard="debris">Debris</button>
+        <button type="button" class="hazard-btn" data-hazard="roadblock">Road Blocked</button>
+        <button type="button" class="hazard-btn" data-hazard="other">Other</button>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <input type="file" id="mediaFile" accept="image/*,video/*" capture="environment"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;">
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <textarea id="reportDescription" placeholder="Optional details..." rows="3"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;box-sizing:border-box;"></textarea>
+    </div>
+    <button class="post-btn" id="reportBtn" onclick="submitReport()" style="margin-top:12px;">Submit Hazard Report</button>
+    <div id="reportStatus" style="color:#9fb3a8; margin-top:8px;"></div>
+  </div>
+
+  <div class="panel" id="lostFoundSection">
+    <h2>LOST &amp; FOUND</h2>
+    <div class="form-group">
+      <label style="color:#9fb3a8; font-family:'Space Grotesk',sans-serif; font-size:13px;">Reporting a</label>
+      <select id="lfType" style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;">
+        <option value="person">Missing person</option>
+        <option value="item">Lost item</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <label style="color:#9fb3a8; font-family:'Space Grotesk',sans-serif; font-size:13px;">Name / description</label>
+      <input type="text" id="lfName" placeholder="e.g. Ravi Ghosh, age 45" style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;box-sizing:border-box;">
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <textarea id="lfDescription" placeholder="Additional details, last seen wearing, etc." rows="3"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;box-sizing:border-box;"></textarea>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <input type="text" id="lfContact" placeholder="Your contact number"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;box-sizing:border-box;">
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <input type="file" id="lfMedia" accept="image/*"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;">
+    </div>
+    <button class="post-btn" onclick="submitLostFound()" style="margin-top:12px;">Submit Lost &amp; Found Report</button>
+    <div id="lfStatus" style="color:#9fb3a8; margin-top:8px;"></div>
+
+    <div style="margin-top:20px;">
+      <input type="text" id="lfSearch" placeholder="Search by name..." oninput="renderLostFoundList()"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;box-sizing:border-box;">
+      <div id="lostFoundList" style="margin-top:14px;">Loading...</div>
+    </div>
+  </div>
+</div>
+
+  <script src="/translations.js"></script>
+  <script src="/offline-queue.js"></script>
+  <script src="/navbar.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/citizen/citizen.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').then(() => {
+        console.log('Service worker registered');
+        if (navigator.onLine) flushSOSQueue();
+      });
+    }
+  </script>
+</body>
+</html>

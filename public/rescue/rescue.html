@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Rescue Agency Portal — SurakshaNER</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#14201b">
+</head>
+<body class="page-home rescue-page">
+  <script>window.NAV_BASE = '../'; window.NAV_CURRENT = 'rescue';</script>
+  <div id="site-navbar"></div>
+
+  <h1 style="padding: 0 24px;">Rescue Agency Dashboard</h1>
+
+  <div id="rescueMap"></div>
+
+  <div class="rescue-grid">
+    <div class="panel">
+      <h2>Post Announcement</h2>
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" id="annTitle" placeholder="e.g. Heavy Rainfall Warning" />
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="annBody" rows="4" placeholder="Details for citizens..."></textarea>
+      </div>
+      <button class="post-btn" onclick="postAnnouncement()">Post Announcement</button>
+      <div id="annStatus" style="margin-top:8px; font-size:13px; color:#7fa08c;"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Active SOS Alerts</h2>
+      <div id="sosList">Loading...</div>
+    </div>
+
+    <div class="panel">
+      <h2>Road Connectivity</h2>
+      <div id="roadList">Loading...</div>
+    </div>
+
+    <div class="panel">
+      <h2> SMS / IVR Outbox</h2>
+      <div id="smsPanel"><p style="color:#7fa08c">No alerts sent yet.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>In Danger</h2>
+      <div id="inDangerList">Loading...</div>
+    </div>
+
+    <div class="panel">
+      <h2>Tiered Alerts</h2>
+      <div id="tieredAlertsList"><p style="color:#7fa08c">No tiered alerts yet.</p></div>
+    </div>
+
+    <div class="panel">
+      <h2>Risk Trajectory (6hr Projection)</h2>
+      <div id="trajectoryList"><p style="color:#7fa08c">Waiting for enough history to project a trend...</p></div>
+    </div>
+
+    <div class="panel" style="grid-column: span 2;">
+      <h2>Field Reports</h2>
+      <div id="photoReportsList">Loading...</div>
+    </div>
+
+    <div class="panel">
+      <h2>Lost &amp; Found</h2>
+      <div id="lostFoundManage">Loading...</div>
+    </div>
+
+    <!-- <div class="panel" style="grid-column: 1 / -1;">
+      <h2>Demo Controls</h2>
+      <div id="demoControls">Loading...</div>
+    </div>
+  </div> -->
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/translations.js"></script>
+  <script src="/navbar.js"></script>
+  <script src="/rescue/rescue.js"></script>
+  <script src="/offline-queue.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').then(() => {
+        console.log('Service worker registered');
+        if (navigator.onLine) flushSOSQueue();
+      });
+    }
+  </script>
+</body>
+</html>

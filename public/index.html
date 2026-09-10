@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SurakshaNER — Landslide Early Warning System</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#14201b">
+</head>
+<body class="page-home">
+  <script>window.NAV_BASE = ''; window.NAV_CURRENT = 'home';</script>
+  <div id="site-navbar"></div>
+
+  <div class="alert-ticker">
+    <div class="alert-ticker-label" data-i18n="alertLabel">ALERT</div>
+    <div class="alert-ticker-track-wrap">
+      <div class="alert-ticker-track">
+        <span data-i18n="tickerHigh">HIGH RISK — Sohra Ridge: soil moisture and tilt rising, avoid NH-6 near Mawsynram, rescue teams on standby</span>
+        <span data-i18n="tickerMedium">MEDIUM RISK — Dawki zone: rainfall trending up, road connectivity normal</span>
+        <span data-i18n="tickerHigh">HIGH RISK — Sohra Ridge: soil moisture and tilt rising, avoid NH-6 near Mawsynram, rescue teams on standby</span>
+        <span data-i18n="tickerMedium">MEDIUM RISK — Dawki zone: rainfall trending up, road connectivity normal</span>
+      </div>
+    </div>
+  </div>
+
+  <section class="hero">
+    <svg class="hero-contours" width="100%" height="220" viewBox="0 0 600 220" preserveAspectRatio="none">
+      <path d="M-20,180 Q150,120 320,170 T650,140" fill="none" stroke="#3a5245" stroke-width="1"/>
+      <path d="M-20,200 Q150,150 320,195 T650,165" fill="none" stroke="#3a5245" stroke-width="1"/>
+      <path d="M-20,220 Q150,180 320,215 T650,190" fill="none" stroke="#3a5245" stroke-width="1"/>
+    </svg>
+    <div class="hero-eyebrow" data-i18n="heroEyebrow">GOVERNMENT OF INDIA &middot; NORTH EASTERN REGION</div>
+    <h1 data-i18n="heroTitle">Keeping India Safe</h1>
+    <p data-i18n="heroSub">Real-time sensor and weather data, AI-scored risk zones, and direct alerts to villages and authorities across NER.</p>
+    <div class="hero-ctas">
+      <button class="cta-primary open-emergency-modal" data-i18n="ctaEmergency">Emergency Services</button>
+      <button id="in-danger-btn" class="in-danger-btn" data-i18n="ctaInDanger">IN DANGER</button>
+    </div>
+  </section>
+
+  <div class="risk-strip">
+    <div class="stat-card">
+      <div class="stat-label" data-i18n="statHighestZone">HIGHEST RISK ZONE</div>
+      <div class="stat-value" id="strip-highest-zone">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" data-i18n="statRiskLevel">RISK LEVEL</div>
+      <div class="stat-value" id="strip-highest-level">—</div>
+      <span id="strip-highest-score" style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#7fa08c;"></span>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label" data-i18n="statZonesMonitored">ZONES MONITORED</div>
+      <div class="stat-value" id="strip-zones-monitored">—</div>
+    </div>
+  </div>
+
+  <section class="map-preview-section">
+    <div class="map-preview-wrapper">
+      <div id="map"></div>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/translations.js"></script>
+  <script src="/navbar.js"></script>
+  <script src="/map.js"></script>
+  <script src="/offline-queue.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').then(() => {
+        console.log('Service worker registered');
+        if (navigator.onLine) flushSOSQueue();
+      });
+    }
+  </script>
+</body>
+</html>
