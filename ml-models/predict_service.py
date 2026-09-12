@@ -57,9 +57,7 @@ with open(os.path.join(MODEL_DIR, 'landslide_rf_model.pkl'), 'rb') as f:
 # Exact feature column order the rainfall model was trained on
 # (needed because the model was trained on one-hot encoded categorical
 # columns - any new input must be reshaped to match this exact structure)
-rainfall_columns = pd.read_csv(
-    os.path.join(MODEL_DIR, 'rainfall_model_columns.csv'), index_col=0
-).index.tolist()
+rainfall_columns = rainfall_model.feature_names_in_.tolist()
 
 # Sensor model's expected column order (no encoding needed, all numeric)
 SENSOR_FEATURES = [
@@ -143,21 +141,26 @@ def predict_rainfall_severity():
     # Build a one-row dataframe matching the categorical inputs, then
     # one-hot encode and reindex to match exactly what the model saw
     # during training (missing categories get filled with 0).
-    raw = pd.DataFrame([{
-        'landslide_trigger': data.get('landslide_trigger', 'unknown'),
-        'landslide_category': data.get('landslide_category', 'unknown'),
-        'landslide_setting': data.get('landslide_setting', 'unknown'),
-    }])
-    encoded = pd.get_dummies(raw, dummy_na=True)
+        # Build the row directly, matching the exact training columns and
+    # order - avoids the fragile get_dummies + reindex approach, which
+    # can produce a feature-name/order mismatch scikit-learn rejects.
+    row = pd.DataFrame(0.0, index=[0], columns=rainfall_columns)
 
-    numeric = pd.DataFrame([{
-        'month': data.get('month', 6),
-        'log_population': data.get('log_population', 0),
-        'gazeteer_distance': data.get('gazeteer_distance', 0),
-    }])
+    trigger_col = f"landslide_trigger_{data.get('landslide_trigger', 'unknown')}"
+    category_col = f"landslide_category_{data.get('landslide_category', 'unknown')}"
+    setting_col = f"landslide_setting_{data.get('landslide_setting', 'unknown')}"
 
-    row = pd.concat([encoded, numeric], axis=1)
-    row = row.reindex(columns=rainfall_columns, fill_value=0)
+    for col in [trigger_col, category_col, setting_col]:
+        if col in row.columns:
+            row.at[0, col] = 1.0
+
+    for col, val in [
+        ('month', data.get('month', 6)),
+        ('log_population', data.get('log_population', 0)),
+        ('gazeteer_distance', data.get('gazeteer_distance', 0)),
+    ]:
+        if col in row.columns:
+            row.at[0, col] = float(val)
 
     proba = rainfall_model.predict_proba(row)[0][1]
     label = 'high_severity' if proba >= 0.5 else 'low_severity'

@@ -351,18 +351,28 @@ mqttClient.on('message', (topic, message) => {
 });
 
 
-
 async function updateAllZonesWeather() {
   const zones = db.prepare('SELECT * FROM zones').all();
   for (const zone of zones) {
     try {
       const mm = await fetchWeatherForZone(zone);
-      const rainfallScore = calculateRainfallRisk(mm);
-      console.log(`Weather check — ${zone.name}: ${mm}mm rain, rainfall risk score ${rainfallScore}`);
+      const fallbackScore = calculateRainfallRisk(mm);
+
+      const mlResult = await getMLRainfallRisk(zone.id, mm);
+      const rainfallScore = mlResult
+        ? mlResult.high_severity_probability * 100
+        : fallbackScore;
+
+      if (mlResult) {
+        console.log(`ML rainfall model (PRIMARY) — ${zone.name}: ${mlResult.severity_label} (${(mlResult.high_severity_probability * 100).toFixed(1)}%)`);
+      } else {
+        console.log(`Weather check (fallback) — ${zone.name}: ${mm}mm rain, rainfall risk score ${fallbackScore}`);
+      }
+
       db.prepare('UPDATE zones SET rainfall_mm = ? WHERE id = ?').run(mm, zone.id);
 
       const sensorRow = db.prepare('SELECT sensor_risk_score, satellite_score FROM zones WHERE id = ?').get(zone.id);
-      updateZoneRisk(zone.id, sensorRow.sensor_risk_score,rainfallScore, sensorRow.satellite_score);
+      updateZoneRisk(zone.id, sensorRow.sensor_risk_score, rainfallScore, sensorRow.satellite_score);
     } catch (err) {
       console.error(`Weather fetch failed for zone ${zone.id}:`, err.message);
     }
@@ -553,6 +563,36 @@ async function getMLSensorRisk(zoneId) {
     return await response.json();
   } catch (err) {
     console.error('ML sensor service unavailable, skipping advisory prediction:', err.message);
+    return null;
+  }
+}
+
+async function getMLRainfallRisk(zoneId, rainfallMm) {
+  // NOTE: this model was trained on event metadata (trigger type, terrain
+  // setting, population, month) rather than raw mm of rainfall directly.
+  // We map our live rainfall reading into the closest matching category
+  // as a working proxy - refining this with real Open-Meteo intensity/duration
+  // features (rather than category proxies) is the next planned upgrade.
+  const currentMonth = new Date().getMonth() + 1;
+
+  const payload = {
+    landslide_trigger: rainfallMm > 35.5 ? 'downpour' : rainfallMm > 2.5 ? 'rain' : 'unknown',
+    landslide_category: 'landslide',
+    landslide_setting: 'above_road',
+    month: currentMonth,
+    log_population: 8,        // neutral placeholder until real per-zone population data is wired in
+    gazeteer_distance: 5       // neutral placeholder until real per-zone distance data is wired in
+  };
+
+  try {
+    const response = await fetch('http://localhost:5001/predict-rainfall-severity', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return await response.json();
+  } catch (err) {
+    console.error('ML rainfall service unavailable, using fallback formula:', err.message);
     return null;
   }
 }
