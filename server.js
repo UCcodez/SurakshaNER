@@ -495,15 +495,66 @@ function calculateRiskForSensor(sensorId, zoneId, sensorType) {
       riskScore = (zScore < Z_SCORE_THRESHOLD) ? 0 : Math.min(100, zScore * 20);
     }
 
-  if (!zoneSensorScores[zoneId]) zoneSensorScores[zoneId] = {};
+    if (!zoneSensorScores[zoneId]) zoneSensorScores[zoneId] = {};
   zoneSensorScores[zoneId][sensorType] = riskScore;
   const combinedSensorScore = Math.max(...Object.values(zoneSensorScores[zoneId]));
 
   const zoneRow = db.prepare('SELECT rainfall_score, satellite_score FROM zones WHERE id = ?').get(zoneId);
   const currentRainfallScore = zoneRow ? zoneRow.rainfall_score : 0;
   const currentSatelliteScore = zoneRow ? zoneRow.satellite_score : 0;
-  updateZoneRisk(zoneId, combinedSensorScore, currentRainfallScore, currentSatelliteScore);
 
+  getMLSensorRisk(zoneId).then(mlResult => {
+    // Primary path: use the ML model's prediction as the real sensor score.
+    // Fallback path: if the Python service is down/unreachable, use the
+    // existing z-score logic instead - so a model-service crash never
+    // breaks the live dashboard.
+    const finalSensorScore = mlResult
+      ? mlResult.risk_probability * 100
+      : combinedSensorScore;
+
+    if (mlResult) {
+      io.emit('mlSensorPrediction', { zoneId, ...mlResult });
+      console.log(`ML model (PRIMARY) — Zone ${zoneId}: ${mlResult.risk_label} (${(mlResult.risk_probability * 100).toFixed(1)}%)`);
+    } else {
+      console.log(`ML service unavailable — Zone ${zoneId}: falling back to z-score logic (${combinedSensorScore.toFixed(1)})`);
+    }
+
+    updateZoneRisk(zoneId, finalSensorScore, currentRainfallScore, currentSatelliteScore);
+  });
+
+}
+
+
+
+async function getMLSensorRisk(zoneId) {
+  const scores = zoneSensorScores[zoneId] || {};
+  const zoneRow = db.prepare('SELECT rainfall_mm FROM zones WHERE id = ?').get(zoneId);
+
+  // Vibration: your SW-420 already does event-counting on a digital pin,
+  // which maps naturally to the model's vibration_events_per_hr feature.
+  // Tilt: MPU6050 is in the hardware plan but not yet soldered/integrated -
+  // using a neutral placeholder (0.4) until it's physically wired up.
+  // Pore pressure: no sensor for this yet at all - neutral placeholder (0.2)
+  // until that hardware is sourced.
+  const payload = {
+    soil_moisture_pct: scores.moisture ? Math.min(45, (scores.moisture / 100) * 45) : 15,
+    tilt_change_deg: scores.tilt ? Math.min(3.0, (scores.tilt / 100) * 3.0) : 0.4,
+    vibration_events_per_hr: scores.vibration ? (scores.vibration / 100) * 10 : 2,
+    pore_pressure_kpa: 0.2,
+    rainfall_mm_24hr: zoneRow ? (zoneRow.rainfall_mm || 0) : 0
+  };
+
+  try {
+    const response = await fetch('http://localhost:5001/predict-sensor-risk', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return await response.json();
+  } catch (err) {
+    console.error('ML sensor service unavailable, skipping advisory prediction:', err.message);
+    return null;
+  }
 }
 
 function calculateTrajectory(zoneId) {
