@@ -391,15 +391,31 @@ function calculatePriorityScore(victimCount, vulnerability,      severity) {
 
 async function updateAllZonesSatellite() {
   const zones = db.prepare('SELECT * FROM zones').all();
+
+  // Since this uses one fixed sample image right now (not per-zone live
+  // imagery), we only need to call the ML service once per cycle, not
+  // once per zone - saves redundant calls until live imagery lands.
+  const mlResult = await getMLSatelliteRisk();
+
   for (const zone of zones) {
     try {
       const wetness = await fetchSatelliteDataForZone(zone);
-      const satelliteScore = calculateSatelliteRisk(wetness);
-      console.log(`Satellite check — ${zone.name}: soil wetness ${wetness}, satellite risk score ${satelliteScore}`);
+      const fallbackScore = calculateSatelliteRisk(wetness);
+
+      const satelliteScore = mlResult
+        ? mlResult.landslide_pixel_percentage
+        : fallbackScore;
+
+      if (mlResult) {
+        console.log(`ML satellite model (PRIMARY) — ${zone.name}: ${mlResult.risk_label} (${mlResult.landslide_pixel_percentage}% landslide pixels)`);
+      } else {
+        console.log(`Satellite check (fallback) — ${zone.name}: soil wetness ${wetness}, satellite risk score ${fallbackScore}`);
+      }
+
       db.prepare('UPDATE zones SET satellite_wetness = ? WHERE id = ?').run(wetness ?? 0, zone.id);
 
       const row = db.prepare('SELECT sensor_risk_score, rainfall_score FROM zones WHERE id = ?').get(zone.id);
-      updateZoneRisk(zone.id, row.sensor_risk_score, row.rainfall_score,satelliteScore);
+      updateZoneRisk(zone.id, row.sensor_risk_score, row.rainfall_score, satelliteScore);
     } catch (err) {
       console.error(`Satellite fetch failed for zone ${zone.id}:`, err.message);
     }
@@ -597,6 +613,19 @@ async function getMLRainfallRisk(zoneId, rainfallMm) {
   }
 }
 
+async function getMLSatelliteRisk() {
+  // NOTE: this currently uses a fixed sample satellite image (not live
+  // per-zone Sentinel-2 imagery), so all zones will get the same result
+  // until live imagery integration is built (planned for December).
+  try {
+    const response = await fetch('http://localhost:5001/predict-satellite-risk');
+    return await response.json();
+  } catch (err) {
+    console.error('ML satellite service unavailable, using fallback formula:', err.message);
+    return null;
+  }
+}
+
 function calculateTrajectory(zoneId) {
   const history = db.prepare(`
     SELECT sensor_score, rainfall_score, satellite_score, recorded_at
@@ -676,7 +705,7 @@ io.on('connection', (socket) => {
 // --- Start server ---
 updateAllZonesWeather(); // ADD THIS LINE
 setInterval(updateAllZonesWeather, 10 * 60 * 1000); // ADD THIS LINE
-// updateAllZonesSatellite();
+updateAllZonesSatellite();
 setInterval(updateAllZonesSatellite, 6*60*60*1000);//every 6 hours, not as frequent as weather updates
 const PORT = 3000;
 server.listen(PORT, () => {
