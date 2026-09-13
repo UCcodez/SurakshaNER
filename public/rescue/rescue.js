@@ -8,15 +8,27 @@ const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/
   attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
 });
 
-L.control.layers(
-  { 'Street Map': streetLayer, 'Satellite': satelliteLayer },
-  {},
-  { position: 'topright' }
+const overlayLayers = {};
+
+let layerControl = null;
+
+layerControl = L.control.layers(
+  {
+    'Street Map': streetLayer,
+    'Satellite': satelliteLayer
+  },
+  overlayLayers,
+  {
+    position: 'topright'
+  }
 ).addTo(map);
 
 const riskColors = { low: '#2ecc71', medium: '#f39c12', high: '#e74c3c' };
 const zoneMarkers = {};
 const zoneData = {};
+
+let riskHeatmap = null;
+
 const sosMarkers = {};
 
 function renderZone(zone) {
@@ -41,6 +53,45 @@ function renderZone(zone) {
   }
 }
 
+function getHeatmapPoints() {
+  return Object.values(zoneData)
+    .filter(zone =>
+      Number.isFinite(Number(zone.lat)) &&
+      Number.isFinite(Number(zone.lng)) &&
+      Number.isFinite(Number(zone.risk_score))
+    )
+    .map(zone => [
+      Number(zone.lat),
+      Number(zone.lng),
+      Math.max(0, Math.min(1, Number(zone.risk_score) / 100))
+    ]);
+}
+
+function updateRiskHeatmap() {
+  const points = getHeatmapPoints();
+
+  if (!riskHeatmap) {
+    riskHeatmap = L.heatLayer(points, {
+      radius: 35,
+      blur: 25,
+      maxZoom: 12,
+      minOpacity: 0.35,
+      gradient: {
+        0.00: '#2ecc71',
+        0.35: '#f1c40f',
+        0.60: '#f39c12',
+        0.80: '#e67e22',
+        1.00: '#e74c3c'
+      }
+    });
+
+    layerControl.addOverlay(riskHeatmap, 'AI Risk Heatmap');
+    riskHeatmap.addTo(map);
+  } else {
+    riskHeatmap.setLatLngs(points);
+  }
+}
+
 function renderSOSPin(alert) {
   if (sosMarkers[alert.id]) return; // already on the map
 
@@ -56,14 +107,39 @@ socket.on('initialZones', (zones) => {
     zoneData[zone.id] = zone;
     renderZone(zone);
   });
+
+  updateRiskHeatmap();
+  // updateRiskStrip();
 });
 
-socket.on('zoneUpdate', (update) => {
-  const cached = zoneData[update.zoneId];
-  if (!cached) return;
-  const merged = { ...cached, risk_score: update.riskScore, risk_level: update.riskLevel };
-  zoneData[update.zoneId] = merged;
-  renderZone(merged);
+socket.on('zoneUpdate', update => {
+  zoneData[update.zoneId] = {
+    ...zoneData[update.zoneId],
+
+    risk_score: Number(update.riskScore),
+    risk_level: update.riskLevel,
+
+    sensor_risk_score:
+      update.sensorRiskScore !== undefined
+        ? Number(update.sensorRiskScore)
+        : zoneData[update.zoneId]?.sensor_risk_score ?? 0,
+
+    rainfall_score:
+      update.rainfallScore !== undefined
+        ? Number(update.rainfallScore)
+        : zoneData[update.zoneId]?.rainfall_score ?? 0,
+
+    satellite_score:
+      update.satelliteScore !== undefined
+        ? Number(update.satelliteScore)
+        : zoneData[update.zoneId]?.satellite_score ?? 0,
+
+    updated_at: new Date().toISOString()
+  };
+
+  renderZone(zoneData[update.zoneId]);
+  updateRiskHeatmap();
+  updateAIDashboard();
 });
 
 socket.on('newSOS', (alert) => {
@@ -232,13 +308,17 @@ loadRoadList();
 
 async function loadDemoControls() {
   const container = document.getElementById('demoControls');
+  if (!container) return;
+
   const res = await fetch('/api/sensors');
   const sensors = await res.json();
 
   container.innerHTML = sensors.map(s => `
     <div class="road-item">
       <strong>${s.id}</strong> (${s.type}) — zone: ${s.zone_id}
-      <button class="post-btn" onclick="triggerSpike('${s.id}')">Trigger Spike</button>
+      <button class="post-btn" onclick="triggerSpike('${s.id}')">
+        Trigger Spike
+      </button>
     </div>
   `).join('');
 }
@@ -440,3 +520,69 @@ async function resolveInDanger(id) {
 socket.on('newInDanger', () => loadInDangerList());
 socket.on('inDangerResolved', () => loadInDangerList());
 loadInDangerList();
+
+
+// AI RISK INTELLIGENCE
+
+
+// =========================
+// AI RISK INTELLIGENCE
+// =========================
+
+function setAIFactor(valueId, barId, value) {
+  const valueElement = document.getElementById(valueId);
+  const barElement = document.getElementById(barId);
+  const rounded = Math.round(value);
+
+  if (valueElement) valueElement.textContent = `${rounded}%`;
+  if (barElement) barElement.style.width = `${Math.min(100, rounded)}%`;
+}
+
+function updateAIDashboard() {
+  const zones = Object.values(zoneData);
+  if (zones.length === 0) return;
+
+  // Show the highest-risk zone as the headline prediction
+  const topZone = zones.reduce((a, b) => (b.risk_score > a.risk_score ? b : a));
+
+  const scoreElement = document.getElementById('aiRiskScore');
+  const levelElement = document.getElementById('aiRiskLevel');
+  const confidenceElement = document.getElementById('aiConfidence');
+  const priorityElement = document.getElementById('aiPriorityZones');
+  const timeElement = document.getElementById('aiLastPrediction');
+  const explanationElement = document.getElementById('aiExplanation');
+  const recommendationElement = document.getElementById('aiRecommendation');
+
+  if (!scoreElement) return;
+
+  scoreElement.innerHTML = `${topZone.risk_score.toFixed(0)}<span>/100</span>`;
+  levelElement.textContent = `${topZone.risk_level.charAt(0).toUpperCase() + topZone.risk_level.slice(1)} risk — ${topZone.name}`;
+
+  // Confidence derived from how far the stacking model's probability sits
+  // from the uncertain midpoint (50) - closer to 0 or 100 means the model
+  // is more decisively confident, not an invented number.
+  const confidence = Math.round(Math.abs(topZone.risk_score - 50) * 2);
+  confidenceElement.textContent = `${confidence}%`;
+
+  const priorityCount = zones.filter(z => z.risk_level !== 'low').length;
+  priorityElement.textContent = priorityCount;
+
+  timeElement.textContent = new Date().toLocaleTimeString();
+
+  explanationElement.textContent =
+    `Combined sensor, rainfall, and satellite analysis for ${topZone.name} indicates ${topZone.risk_level} risk conditions.`;
+
+  recommendationElement.textContent =
+    topZone.risk_level === 'high'
+      ? 'Issue a warning and prepare rescue teams for rapid deployment.'
+      : topZone.risk_level === 'medium'
+      ? 'Monitor closely and prepare contingency resources.'
+      : 'Continue routine monitoring.';
+
+  setAIFactor('aiSensorValue', 'aiSensorBar', topZone.sensor_risk_score ?? 0);
+  setAIFactor('aiRainfallValue', 'aiRainfallBar', topZone.rainfall_score ?? 0);
+  setAIFactor('aiSatelliteValue', 'aiSatelliteBar', topZone.satellite_score ?? 0);
+
+  const statusElement = document.getElementById('aiModelStatus');
+  if (statusElement) statusElement.textContent = 'Live';
+}

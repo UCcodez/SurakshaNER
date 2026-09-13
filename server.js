@@ -429,7 +429,23 @@ function updateZoneRisk(zoneId, sensorRiskScore, rainfallScore, satelliteScore) 
   rainfallScore = rainfallScore ?? 0;
   satelliteScore = satelliteScore ?? 0;
 
-  const blendedScore = Math.min(100, (sensorRiskScore * 0.5) + (rainfallScore * 0.3) + (satelliteScore * 0.2));
+  // Learned weights from stacking meta-model (logistic regression),
+  // trained on simulated multi-modal risk combinations grounded in
+  // domain logic (real combined sensor+rainfall+satellite+outcome
+  // data does not exist publicly - see stacking_training_data.csv methodology)
+  const STACK_COEF = { sensor: 0.04650279, rainfall: 0.04484203, satellite: 0.02576601 };
+  const STACK_INTERCEPT = -4.5545;
+
+  const logit = (sensorRiskScore * STACK_COEF.sensor) +
+                (rainfallScore * STACK_COEF.rainfall) +
+                (satelliteScore * STACK_COEF.satellite) +
+                STACK_INTERCEPT;
+  const probability = 1 / (1 + Math.exp(-logit));
+  const blendedScore = Math.min(100, probability * 100);
+  
+  console.log(
+  `Risk calculation — Zone ${zoneId}: logit=${logit.toFixed(3)}, probability=${probability.toFixed(4)}, blended=${blendedScore.toFixed(1)}`
+  );
 
   let riskLevel = 'low';
   if (blendedScore > 60) riskLevel = 'high';

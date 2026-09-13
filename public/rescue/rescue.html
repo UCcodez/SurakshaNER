@@ -15,6 +15,99 @@
 
   <div id="rescueMap"></div>
 
+  <section class="ai-risk-dashboard">
+    <div class="ai-dashboard-header">
+      <div>
+        <p class="ai-eyebrow">AI RISK INTELLIGENCE</p>
+        <h2>Predictive Landslide Monitoring</h2>
+        <p class="ai-subtitle">
+          Machine-learning insights for prioritising rescue operations.
+        </p>
+      </div>
+
+      <span id="aiModelStatus" class="ai-status">Demo mode</span>
+    </div>
+
+    <div class="ai-summary-grid">
+      <div class="ai-stat-card">
+        <span class="ai-stat-label">Overall Risk</span>
+        <strong id="aiRiskScore">78<span>/100</span></strong>
+        <small id="aiRiskLevel">High risk</small>
+      </div>
+
+      <div class="ai-stat-card">
+        <span class="ai-stat-label">Model Confidence</span>
+        <strong id="aiConfidence">92%</strong>
+        <small>Prediction confidence</small>
+      </div>
+
+      <div class="ai-stat-card">
+        <span class="ai-stat-label">Priority Zones</span>
+        <strong id="aiPriorityZones">3</strong>
+        <small>Require attention</small>
+      </div>
+
+      <div class="ai-stat-card">
+        <span class="ai-stat-label">Last Prediction</span>
+        <strong id="aiLastPrediction">--:--</strong>
+        <small>Local system time</small>
+      </div>
+    </div>
+
+    <div class="ai-detail-grid">
+      <div class="ai-panel">
+        <h3>AI Explanation</h3>
+        <p id="aiExplanation">
+          Elevated rainfall and unstable terrain conditions are contributing
+          to increased landslide risk.
+        </p>
+
+        <div class="ai-recommendation">
+          <strong>Recommended action</strong>
+          <p id="aiRecommendation">
+            Issue a warning and prepare rescue teams for rapid deployment.
+          </p>
+        </div>
+      </div>
+
+      <div class="ai-panel">
+        <h3>Contributing Factors</h3>
+
+                <div class="ai-factor">
+          <div>
+            <span>Sensor Score</span>
+            <strong id="aiSensorValue">--%</strong>
+          </div>
+          <div class="ai-progress">
+            <span id="aiSensorBar" style="width:0%"></span>
+          </div>
+        </div>
+
+        <div class="ai-factor">
+          <div>
+            <span>Rainfall Score</span>
+            <strong id="aiRainfallValue">--%</strong>
+          </div>
+          <div class="ai-progress">
+            <span id="aiRainfallBar" style="width:0%"></span>
+          </div>
+        </div>
+
+        <div class="ai-factor">
+          <div>
+            <span>Satellite Score</span>
+            <strong id="aiSatelliteValue">--%</strong>
+          </div>
+          <div class="ai-progress">
+            <span id="aiSatelliteBar" style="width:0%"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
   <div class="rescue-grid">
     <div class="panel">
       <h2>Post Announcement</h2>
@@ -78,6 +171,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
   <script src="/translations.js"></script>
   <script src="/navbar.js"></script>
   <script src="/rescue/rescue.js"></script>

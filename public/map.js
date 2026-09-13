@@ -1,3 +1,5 @@
+let layerControl = null;
+
 const map = L.map('map').setView([25.8, 91.8], 7);
 
 const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -8,15 +10,53 @@ const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/
   attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
 });
 
-L.control.layers(
-  { 'Street Map': streetLayer, 'Satellite': satelliteLayer },
+const overlayLayers = {};
+
+layerControl = L.control.layers(
+  {
+    'Street Map': streetLayer,
+    'Satellite': satelliteLayer
+  },
   {},
-  { position: 'topright' }
+  {
+    position: 'topright'
+  }
 ).addTo(map);
 
-const riskColors = { low: '#2ecc71', medium: '#f39c12', high: '#e74c3c' };
+const riskColors = {
+  low: '#2ecc71',
+  medium: '#f39c12',
+  high: '#e74c3c'
+};
+
 const zoneMarkers = {};
 const zoneData = {};
+
+let riskHeatmap = null;
+
+function getHeatmapPoints() {
+  return Object.values(zoneData)
+    .filter(zone =>
+      Number.isFinite(Number(zone.lat)) &&
+      Number.isFinite(Number(zone.lng)) &&
+      Number.isFinite(Number(zone.risk_score))
+    )
+    .map(zone => {
+      const latitude = Number(zone.lat);
+      const longitude = Number(zone.lng);
+
+      // Convert a 0–100 risk score into a 0–1 heat intensity.
+      const intensity = Math.max(
+        0,
+        Math.min(1, Number(zone.risk_score) / 100)
+      );
+
+      return [latitude, longitude, intensity];
+    });
+}
+
+ 
+
 
 function renderZone(zone) {
   const id = zone.id;
@@ -37,6 +77,32 @@ function renderZone(zone) {
     }).addTo(map);
     circle.bindPopup(`<b>${zone.name}</b><br>Risk: ${score.toFixed(1)} (${zone.risk_level})`);
     zoneMarkers[id] = circle;
+  }
+}
+
+
+function updateRiskHeatmap() {
+  const points = getHeatmapPoints();
+
+  if (!riskHeatmap) {
+    riskHeatmap = L.heatLayer(points, {
+      radius: 35,
+      blur: 25,
+      maxZoom: 12,
+      minOpacity: 0.35,
+      gradient: {
+        0.00: '#2ecc71',
+        0.35: '#f1c40f',
+        0.60: '#f39c12',
+        0.80: '#e67e22',
+        1.00: '#e74c3c'
+      }
+    });
+
+    layerControl.addOverlay(riskHeatmap, 'AI Risk Heatmap');
+    riskHeatmap.addTo(map);
+  } else {
+    riskHeatmap.setLatLngs(points);
   }
 }
 
@@ -67,6 +133,8 @@ socket.on('initialZones', (zones) => {
     zoneData[zone.id] = zone;
     renderZone(zone);
   });
+
+  updateRiskHeatmap();
   updateRiskStrip();
 });
 
@@ -76,11 +144,14 @@ socket.on('zoneUpdate', (update) => {
 
   const merged = {
     ...cached,
-    risk_score: update.riskScore,
+    risk_score: Number(update.riskScore),
     risk_level: update.riskLevel
   };
+
   zoneData[update.zoneId] = merged;
+
   renderZone(merged);
+  updateRiskHeatmap();
   updateRiskStrip();
 });
 
