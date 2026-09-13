@@ -38,10 +38,15 @@ for the December build phase, once live satellite/sensor feeds replace
 the current trained-on-historical-data models.
 """
 
+import numpy as np
+
 from flask import Flask, request, jsonify
 import pickle
 import pandas as pd
 import os
+import h5py
+import torch
+from Networks import unet
 
 app = Flask(__name__)
 
@@ -53,6 +58,18 @@ with open(os.path.join(MODEL_DIR, 'sensor_extratrees_model.pkl'), 'rb') as f:
 
 with open(os.path.join(MODEL_DIR, 'landslide_rf_model.pkl'), 'rb') as f:
     rainfall_model = pickle.load(f)
+
+# Exact normalization stats from training (dataset/landslide_dataset.py)
+SATELLITE_MEAN = [-0.4914, -0.3074, -0.1277, -0.0625, 0.0439, 0.0803, 0.0644, 0.0802, 0.3000, 0.4082, 0.0823, 0.0516, 0.3338, 0.7819]
+SATELLITE_STD = [0.9325, 0.8775, 0.8860, 0.8869, 0.8857, 0.8418, 0.8354, 0.8491, 0.9061, 1.6072, 0.8848, 0.9232, 0.9018, 1.2913]
+
+satellite_model = unet(n_classes=2, n_channels=14)
+satellite_checkpoint = torch.load(
+    os.path.join(MODEL_DIR, 'batch500_F1_5340.pth'), map_location='cpu'
+)
+satellite_model.load_state_dict(satellite_checkpoint)
+satellite_model.eval()
+
 
 # Exact feature column order the rainfall model was trained on
 # (needed because the model was trained on one-hot encoded categorical
@@ -111,6 +128,40 @@ def predict_sensor_risk():
         'risk_label': label
     })
 
+
+@app.route('/predict-satellite-risk', methods=['GET'])
+def predict_satellite_risk():
+    """
+    NOTE: Currently uses a fixed sample satellite image (from the
+    Landslide4Sense validation set) as a stand-in input, since live
+    per-zone Sentinel-2 imagery integration (Google Earth Engine /
+    Copernicus) is planned for the December build phase, not yet built.
+    """
+    with h5py.File(os.path.join(MODEL_DIR, 'sample_satellite_image.h5'), 'r') as hf:
+        image = hf['img'][:]
+
+    image = np.asarray(image, np.float32)
+    image = image.transpose((-1, 0, 1))  # channels-first, matching training
+
+    for i in range(len(SATELLITE_MEAN)):
+        image[i, :, :] -= SATELLITE_MEAN[i]
+        image[i, :, :] /= SATELLITE_STD[i]
+
+    image_tensor = torch.from_numpy(image).unsqueeze(0)  # add batch dimension
+
+    with torch.no_grad():
+        logits = satellite_model(image_tensor)
+        pred_mask = torch.argmax(logits, dim=1).squeeze(0).numpy()
+
+    total_pixels = pred_mask.size
+    landslide_pixels = int(np.sum(pred_mask == 1))
+    risk_percentage = round((landslide_pixels / total_pixels) * 100, 2)
+
+    return jsonify({
+        'landslide_pixel_percentage': risk_percentage,
+        'risk_label': 'high_risk' if risk_percentage > 5 else 'normal',
+        'note': 'Using sample validation image, not live satellite feed (planned for December build)'
+    })
 
 @app.route('/predict-rainfall-severity', methods=['POST'])
 def predict_rainfall_severity():
