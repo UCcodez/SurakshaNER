@@ -86,16 +86,17 @@ function updateRiskHeatmap() {
 
   if (!riskHeatmap) {
     riskHeatmap = L.heatLayer(points, {
-      radius: 35,
-      blur: 25,
-      maxZoom: 12,
-      minOpacity: 0.35,
+      radius: 55,
+      blur: 35,
+      maxZoom: 10,
+      minOpacity: 0.55,
+      max: 1.0,
       gradient: {
-        0.00: '#2ecc71',
-        0.35: '#f1c40f',
-        0.60: '#f39c12',
-        0.80: '#e67e22',
-        1.00: '#e74c3c'
+        0.00: '#1abc4c',
+        0.25: '#f1e740',
+        0.50: '#ff9f1c',
+        0.75: '#ff4d29',
+        1.00: '#c0392b'
       }
     });
 
@@ -135,7 +136,8 @@ socket.on('initialZones', (zones) => {
   });
 
   updateRiskHeatmap();
-  updateRiskStrip();
+  updateAIDashboard();
+  renderRecentLocationTiles();
 });
 
 socket.on('zoneUpdate', (update) => {
@@ -153,6 +155,7 @@ socket.on('zoneUpdate', (update) => {
   renderZone(merged);
   updateRiskHeatmap();
   updateRiskStrip();
+  renderRecentLocationTiles();
 });
 
 const roadColors = { clear: '#2ecc71', at_risk: '#f39c12', blocked: '#e74c3c' };

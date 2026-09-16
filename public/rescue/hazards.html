@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Hazard Alerts — SurakshaNER</title>
+
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    body.rescue-page {
+      background: #071a0d;
+      color: #ffffff;
+    }
+
+    h1 {
+      padding: 0 24px;
+      color: #ffffff !important;
+    }
+
+    .panel {
+      background: #162c23;
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    #hazardList,
+    #hazardList * {
+      color: #ffffff;
+    }
+
+    .hazard-card {
+      margin-bottom: 16px;
+      border: 1px solid #315441;
+    }
+
+    .hazard-image {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      max-height: 350px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 14px;
+    }
+
+    .hazard-location {
+      color: #c8e6d0 !important;
+      word-break: break-word;
+    }
+
+    .hazard-link {
+      color: #a9d8ff !important;
+    }
+
+    .empty-message,
+    .error-message {
+      padding: 12px 0;
+    }
+  </style>
+</head>
+
+<body class="rescue-page">
+
+  <script>
+    window.NAV_BASE = '../';
+    window.NAV_CURRENT = 'rescue';
+  </script>
+
+  <div id="site-navbar"></div>
+
+  <div style="padding: 16px 24px;">
+    <a
+      href="/rescue/rescue.html"
+      style="color: #f5f9f6; text-decoration: none;"
+    >
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  <h1>Hazard Alerts</h1>
+
+  <div class="rescue-grid">
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div id="hazardList">Loading...</div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/navbar.js"></script>
+
+  <script>
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function getImageUrl(report) {
+      const value =
+        report.imageUrl ||
+        report.image_url ||
+        report.photoUrl ||
+        report.photo_url ||
+        report.image ||
+        report.photo ||
+        report.filePath ||
+        report.file_path ||
+        report.fileName ||
+        report.file_name;
+
+      if (!value || typeof value !== 'string') {
+        return '';
+      }
+
+      if (
+        value.startsWith('http://') ||
+        value.startsWith('https://') ||
+        value.startsWith('/')
+      ) {
+        return value;
+      }
+
+      const filename = value.split(/[\\/]/).pop();
+
+      return `/uploads/${encodeURIComponent(filename)}`;
+    }
+
+    function getLatitude(report) {
+      return (
+        report.latitude ??
+        report.lat ??
+        report.location?.latitude ??
+        report.location?.lat ??
+        report.coordinates?.latitude ??
+        report.coordinates?.lat ??
+        'N/A'
+      );
+    }
+
+    function getLongitude(report) {
+      return (
+        report.longitude ??
+        report.lng ??
+        report.lon ??
+        report.location?.longitude ??
+        report.location?.lng ??
+        report.location?.lon ??
+        report.coordinates?.longitude ??
+        report.coordinates?.lng ??
+        report.coordinates?.lon ??
+        'N/A'
+      );
+    }
+
+    function getLocationText(report) {
+      if (typeof report.location === 'string') {
+        return report.location;
+      }
+
+      const latitude = getLatitude(report);
+      const longitude = getLongitude(report);
+
+      return `${latitude}, ${longitude}`;
+    }
+
+    async function loadHazards() {
+      const el = document.getElementById('hazardList');
+
+      if (!el) {
+        return;
+      }
+
+      el.innerHTML = '<p>Loading hazard reports...</p>';
+
+      try {
+        const response = await fetch('/api/photo-reports');
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const reports = await response.json();
+
+        if (!Array.isArray(reports) || reports.length === 0) {
+          el.innerHTML = `
+            <p class="empty-message">
+              No hazard reports found.
+            </p>
+          `;
+          return;
+        }
+
+        el.innerHTML = reports.map((report) => {
+          const imageUrl = getImageUrl(report);
+
+          const title =
+            report.title ||
+            report.hazard_type ||
+            report.hazardType ||
+            'Hazard Report';
+
+          const description =
+            report.description ||
+            report.message ||
+            report.details ||
+            'No description provided.';
+
+          const locationText = getLocationText(report);
+
+          const timestamp =
+            report.createdAt ||
+            report.created_at ||
+            report.timestamp ||
+            '';
+
+          return `
+            <div class="panel hazard-card">
+
+              ${
+                imageUrl
+                  ? `
+                    <img
+                      class="hazard-image"
+                      src="${escapeHtml(imageUrl)}"
+                      alt="Reported hazard"
+                      onerror="this.style.display='none';"
+                    >
+                  `
+                  : `
+                    <p>No image available.</p>
+                  `
+              }
+
+              <h2>${escapeHtml(title)}</h2>
+
+              <p>
+                ${escapeHtml(description)}
+              </p>
+
+              <p class="hazard-location">
+                <strong>Location:</strong>
+                ${escapeHtml(locationText)}
+              </p>
+
+              ${
+                timestamp
+                  ? `
+                    <p>
+                      <strong>Reported:</strong>
+                      ${escapeHtml(timestamp)}
+                    </p>
+                  `
+                  : ''
+              }
+
+              ${
+                report.status
+                  ? `
+                    <p>
+                      <strong>Status:</strong>
+                      ${escapeHtml(report.status)}
+                    </p>
+                  `
+                  : ''
+              }
+
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Failed to load hazards:', error);
+
+        el.innerHTML = `
+          <p class="error-message">
+            Failed to load hazard reports.
+          </p>
+        `;
+      }
+    }
+
+    const socket = io();
+
+    socket.on('newPhotoReport', loadHazards);
+    socket.on('photoReportCreated', loadHazards);
+    socket.on('photo-report-created', loadHazards);
+
+    loadHazards();
+  </script>
+
+</body>
+</html>

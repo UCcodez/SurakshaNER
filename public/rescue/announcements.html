@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Post Announcement — SurakshaNER</title>
+
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    body.rescue-page {
+      background: #071a0d;
+      color: #ffffff;
+    }
+
+    h1 {
+      padding: 0 24px;
+      color: #ffffff !important;
+    }
+
+    .panel {
+      background: #162c23;
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 6px;
+      color: #ffffff;
+      font-weight: bold;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px;
+      border: 1px solid #527361;
+      border-radius: 8px;
+      background: #0d2116;
+      color: #ffffff;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 18px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #4f9d69;
+      color: #ffffff;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #3d8054;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #statusMessage {
+      margin-top: 14px;
+      font-weight: bold;
+    }
+
+    .announcement-card {
+      margin-top: 16px;
+      border: 1px solid #315441;
+    }
+
+    .announcement-card h2 {
+      margin-top: 0;
+    }
+
+    .announcement-meta {
+      color: #b9d5c2 !important;
+      font-size: 0.9rem;
+    }
+
+    .announcement-body {
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body class="rescue-page">
+
+  <script>
+    window.NAV_BASE = '../';
+    window.NAV_CURRENT = 'rescue';
+
+    // Prevent navbar.js from crashing if this function is absent.
+    window.initLanguage = window.initLanguage || function () {};
+  </script>
+
+  <div id="site-navbar"></div>
+
+  <div style="padding: 16px 24px;">
+    <a
+      href="/rescue/rescue.html"
+      style="color: #f5f9f6; text-decoration: none;"
+    >
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  <h1>Post Announcement</h1>
+
+  <div class="rescue-grid">
+
+    <div class="panel" style="grid-column: 1 / -1;">
+      <form id="announcementForm">
+
+        <label for="announcementTitle">
+          Announcement Title
+        </label>
+
+        <input
+          id="announcementTitle"
+          type="text"
+          placeholder="Example: Heavy rainfall warning"
+          required
+        >
+
+        <label for="announcementBody">
+          Announcement Message
+        </label>
+
+        <textarea
+          id="announcementBody"
+          placeholder="Write the announcement that citizens should receive..."
+          required
+        ></textarea>
+
+        <input
+          id="announcementAudience"
+          type="hidden"
+          value="citizens"
+        >
+
+        <button id="publishButton" type="submit">
+          Publish to Citizen Portal
+        </button>
+
+        <div id="statusMessage" aria-live="polite"></div>
+
+      </form>
+    </div>
+
+    <div class="panel" style="grid-column: 1 / -1;">
+      <h2>Previously Posted Announcements</h2>
+      <div id="announcementList">Loading...</div>
+    </div>
+
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/navbar.js"></script>
+
+  <script>
+    const form = document.getElementById('announcementForm');
+    const titleInput = document.getElementById('announcementTitle');
+    const bodyInput = document.getElementById('announcementBody');
+    const audienceInput = document.getElementById('announcementAudience');
+    const publishButton = document.getElementById('publishButton');
+    const statusMessage = document.getElementById('statusMessage');
+    const announcementList = document.getElementById('announcementList');
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function formatDate(value) {
+      if (!value) {
+        return '';
+      }
+
+      const date = new Date(value);
+
+      if (Number.isNaN(date.getTime())) {
+        return String(value);
+      }
+
+      return date.toLocaleString();
+    }
+
+    async function loadAnnouncements() {
+      try {
+        const response = await fetch('/api/announcements');
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const announcements = await response.json();
+
+        if (!Array.isArray(announcements) || announcements.length === 0) {
+          announcementList.innerHTML =
+            '<p>No announcements posted yet.</p>';
+          return;
+        }
+
+        announcementList.innerHTML = announcements.map((announcement) => {
+          const title = announcement.title || 'Announcement';
+          const body = announcement.body || 'No message available.';
+          const date = formatDate(
+            announcement.created_at || announcement.createdAt
+          );
+
+          return `
+            <div class="panel announcement-card">
+              <h2>${escapeHtml(title)}</h2>
+
+              <p class="announcement-body">
+                ${escapeHtml(body)}
+              </p>
+
+              <p class="announcement-meta">
+                <strong>Audience:</strong>
+                ${escapeHtml(announcement.audience || 'citizens')}
+              </p>
+
+              ${
+                date
+                  ? `
+                    <p class="announcement-meta">
+                      <strong>Posted:</strong>
+                      ${escapeHtml(date)}
+                    </p>
+                  `
+                  : ''
+              }
+            </div>
+          `;
+        }).join('');
+
+      } catch (error) {
+        console.error('Failed to load announcements:', error);
+
+        announcementList.innerHTML =
+          '<p>Could not load previous announcements.</p>';
+      }
+    }
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      const title = titleInput.value.trim();
+      const body = bodyInput.value.trim();
+      const audience = audienceInput.value;
+
+      if (!title || !body) {
+        statusMessage.textContent =
+          'Please enter both a title and a message.';
+        return;
+      }
+
+      publishButton.disabled = true;
+      statusMessage.textContent = 'Publishing announcement...';
+
+      try {
+        const response = await fetch('/api/announcements', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            title: title,
+            body: body,
+            audience: audience
+          })
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(
+            result.error ||
+            result.message ||
+            `HTTP ${response.status}`
+          );
+        }
+
+        statusMessage.textContent =
+          'Announcement published to the Citizen Portal.';
+
+        form.reset();
+        audienceInput.value = 'citizens';
+
+        await loadAnnouncements();
+
+      } catch (error) {
+        console.error('Failed to publish announcement:', error);
+
+        statusMessage.textContent =
+          `Failed to publish announcement: ${error.message}`;
+
+      } finally {
+        publishButton.disabled = false;
+      }
+    });
+
+    if (typeof io === 'function') {
+      const socket = io();
+
+      socket.on('newAnnouncement', function() {
+        loadAnnouncements();
+      });
+    }
+
+    loadAnnouncements();
+  </script>
+
+</body>
+</html>

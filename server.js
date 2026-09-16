@@ -2,6 +2,8 @@ const { fetchWeatherForZone, calculateRainfallRisk } = require('./weather.js');
 
 const MOISTURE_DRY_BASELINE = 3200; // calibrated from your own testing
 const zoneSensorScores = {};
+let demoMode = 'normal'; // 'normal' | 'sensor-focus'
+const demoOverrides = { rainfall: null, satellite: null };
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -13,6 +15,21 @@ const db = new Database('disaster.db');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
+
+
+const STACK_PROFILES = {
+  normal: {
+    coef: { sensor: 0.04650279, rainfall: 0.04484203, satellite: 0.02576601 },
+    intercept: -4.5545
+  },
+  'sensor-focus': {
+    // Demo-only profile: heavily weights sensor input so real hardware
+    // triggers a visible, dramatic response on its own. Not the trained
+    // production model - used only to showcase live hardware during demos.
+    coef: { sensor: 0.09, rainfall: 0.008, satellite: 0.004 },
+    intercept: -4.0
+  }
+};
 
 const { fetchSatelliteDataForZone, calculateSatelliteRisk } = require('./satellite.js');
 // Serve a simple static test page from a "public" folder
@@ -312,7 +329,50 @@ app.post('/api/sos/:id/status', (req, res) => {
 
 
 
+app.post('/api/demo/mode', (req, res) => {
+  const { mode } = req.body;
+  if (!['normal', 'sensor-focus'].includes(mode)) {
+    return res.status(400).json({ error: 'mode must be normal or sensor-focus' });
+  }
+  demoMode = mode;
+  console.log(`Demo mode set to: ${demoMode}`);
+  res.json({ demoMode });
+});
 
+app.post('/api/demo/spike-rainfall', (req, res) => {
+  demoOverrides.rainfall = 90;
+  const zones = db.prepare('SELECT * FROM zones').all();
+  zones.forEach(zone => {
+    const row = db.prepare('SELECT sensor_risk_score, satellite_score FROM zones WHERE id = ?').get(zone.id);
+    updateZoneRisk(zone.id, row.sensor_risk_score, 90, row.satellite_score, true); // force
+  });
+  res.json({ ok: true, rainfallOverride: 90 });
+});
+
+app.post('/api/demo/spike-satellite', (req, res) => {
+  demoOverrides.satellite = 90;
+  const zones = db.prepare('SELECT * FROM zones').all();
+  zones.forEach(zone => {
+    const row = db.prepare('SELECT sensor_risk_score, satellite_score FROM zones WHERE id = ?').get(zone.id);
+    updateZoneRisk(zone.id, row.sensor_risk_score, 90, row.satellite_score, true); // force
+  });
+  res.json({ ok: true, satelliteOverride: 90 });
+});
+
+app.post('/api/demo/reset', (req, res) => {
+  demoOverrides.rainfall = null;
+  demoOverrides.satellite = null;
+  demoMode = 'normal';
+  console.log('Demo: reset to normal');
+
+  const zones = db.prepare('SELECT * FROM zones').all();
+  zones.forEach(zone => {
+    const row = db.prepare('SELECT sensor_risk_score, rainfall_score, satellite_score FROM zones WHERE id = ?').get(zone.id);
+    updateZoneRisk(zone.id, row.sensor_risk_score, row.rainfall_score, row.satellite_score, true);
+  });
+
+  res.json({ ok: true, demoMode, demoOverrides });
+});
 
 
 
@@ -423,35 +483,68 @@ async function updateAllZonesSatellite() {
 }
 
 
-function updateZoneRisk(zoneId, sensorRiskScore, rainfallScore, satelliteScore) {
+function updateZoneRisk(zoneId, sensorRiskScore, rainfallScore, satelliteScore,forceUpdate = false){
 
   sensorRiskScore = sensorRiskScore ?? 0;
   rainfallScore = rainfallScore ?? 0;
   satelliteScore = satelliteScore ?? 0;
 
-  // Learned weights from stacking meta-model (logistic regression),
-  // trained on simulated multi-modal risk combinations grounded in
-  // domain logic (real combined sensor+rainfall+satellite+outcome
-  // data does not exist publicly - see stacking_training_data.csv methodology)
-  const STACK_COEF = { sensor: 0.04650279, rainfall: 0.04484203, satellite: 0.02576601 };
-  const STACK_INTERCEPT = -4.5545;
+  // Demo overrides let rainfall/satellite be forced high for demo purposes
+  // (since we can't make it rain or feed live satellite imagery on demand)
+  const effectiveRainfall = demoOverrides.rainfall !== null ? demoOverrides.rainfall : rainfallScore;
+  const effectiveSatellite = demoOverrides.satellite !== null ? demoOverrides.satellite : satelliteScore;
 
-  const logit = (sensorRiskScore * STACK_COEF.sensor) +
-                (rainfallScore * STACK_COEF.rainfall) +
-                (satelliteScore * STACK_COEF.satellite) +
-                STACK_INTERCEPT;
-  const probability = 1 / (1 + Math.exp(-logit));
-  const blendedScore = Math.min(100, probability * 100);
-  
-  console.log(
+  let blendedScore;
+  if (demoMode === 'sensor-focus') {
+    // DEMO-ONLY blend, heavily weighted toward sensor input, so real ESP32
+    // hardware visibly drives the dashboard on its own. This is NOT the
+    // trained stacking model - it's a presentation mode for showing live
+    // hardware response, clearly separate from production logic.
+    blendedScore = Math.min(100, (sensorRiskScore * 0.85) + (effectiveRainfall * 0.10) + (effectiveSatellite * 0.05));
+     console.log(`Risk calculation (sensor-focus) — Zone ${zoneId}: blended=${blendedScore.toFixed(1)}`);
+  } else {
+    // NORMAL: real trained stacking meta-model (logistic regression)
+    const STACK_COEF = { sensor: 0.04650279, rainfall: 0.04484203, satellite: 0.02576601 };
+    const STACK_INTERCEPT = -4.5545;
+    const logit = (sensorRiskScore * STACK_COEF.sensor) +
+                  (effectiveRainfall * STACK_COEF.rainfall) +
+                  (effectiveSatellite * STACK_COEF.satellite) +
+                  STACK_INTERCEPT;
+    const probability = 1 / (1 + Math.exp(-logit));
+    blendedScore = Math.min(100, probability * 100);
+
+    console.log(
   `Risk calculation — Zone ${zoneId}: logit=${logit.toFixed(3)}, probability=${probability.toFixed(4)}, blended=${blendedScore.toFixed(1)}`
   );
+  }
+
+  
+  
+  // multi-source = public warning), matching real early-warning practice.
+  const sensorHigh = sensorRiskScore > 60;
+  const rainfallHigh = effectiveRainfall > 60;
+  const satelliteHigh = effectiveSatellite > 60;
+  const highCount = [sensorHigh, rainfallHigh, satelliteHigh].filter(Boolean).length;
+
+  let scenario, recommendedAction;
+  if (highCount >= 2) {
+    scenario = 'multi-source';
+    recommendedAction = 'Multi-source confirmation — issue public warning and deploy rescue teams.';
+  } else if (highCount === 1) {
+    scenario = 'single-source';
+    recommendedAction = 'Single-source anomaly detected — dispatch team to verify before public alert.';
+  } else {
+    scenario = 'normal';
+    recommendedAction = 'Continue routine monitoring.';
+  }
+  
+  
 
   let riskLevel = 'low';
   if (blendedScore > 60) riskLevel = 'high';
   else if (blendedScore > 25) riskLevel = 'medium';
 
-  const existingZone = db.prepare('SELECT risk_level, updated_at FROM zones WHERE id = ?').get(zoneId);
+  const existingZone = db.prepare('SELECT risk_level, risk_score, updated_at FROM zones WHERE id = ?').get(zoneId);
   const secondsSinceLastUpdate = existingZone
     ? (Date.now() - new Date(existingZone.updated_at.replace(' ', 'T') + 'Z').getTime()) / 1000
     : 999;
@@ -462,7 +555,8 @@ function updateZoneRisk(zoneId, sensorRiskScore, rainfallScore, satelliteScore) 
     (riskLevel === 'medium' && existingZone.risk_level === 'low')
   );
 
-  const shouldUpdate = !existingZone || levelEscalated || (levelChanged && secondsSinceLastUpdate > 5);
+  const scoreChanged = !existingZone || Math.abs(blendedScore - (existingZone.risk_score ?? 0)) > 3;
+  const shouldUpdate = forceUpdate || !existingZone || levelEscalated || (levelChanged && secondsSinceLastUpdate > 5) || (scoreChanged && secondsSinceLastUpdate > 2);
 
   if (shouldUpdate) {
     db.prepare('INSERT INTO risk_history (zone_id, sensor_score, rainfall_score, satellite_score, risk_score) VALUES (?, ?, ?, ?, ?)').run(zoneId, sensorRiskScore, rainfallScore, satelliteScore, blendedScore);
@@ -473,7 +567,12 @@ function updateZoneRisk(zoneId, sensorRiskScore, rainfallScore, satelliteScore) 
     `).run(blendedScore, riskLevel, sensorRiskScore, rainfallScore, satelliteScore, zoneId);
 
     console.log(`Zone ${zoneId}: sensor=${sensorRiskScore.toFixed(1)}, rainfall=${rainfallScore.toFixed(1)}, satellite=${satelliteScore.toFixed(1)}, blended=${blendedScore.toFixed(1)} (${riskLevel})`);
-    io.emit('zoneUpdate', { zoneId, riskScore: blendedScore, riskLevel, sensorRiskScore, rainfallScore, satelliteScore });
+
+    io.emit('zoneUpdate', {
+      zoneId, riskScore: blendedScore, riskLevel,
+      sensorRiskScore, rainfallScore: effectiveRainfall, satelliteScore: effectiveSatellite,
+      scenario, recommendedAction, demoMode
+    });
 
     if (riskLevel === 'high') {
       const zoneInfo = db.prepare('SELECT name FROM zones WHERE id = ?').get(zoneId);
@@ -723,6 +822,11 @@ updateAllZonesWeather(); // ADD THIS LINE
 setInterval(updateAllZonesWeather, 10 * 60 * 1000); // ADD THIS LINE
 updateAllZonesSatellite();
 setInterval(updateAllZonesSatellite, 6*60*60*1000);//every 6 hours, not as frequent as weather updates
+// Always start in a clean, known state - prevents leftover demo overrides
+demoOverrides.rainfall = null;
+demoOverrides.satellite = null;
+demoMode = 'normal';
+console.log('Startup: demo state reset to normal, no overrides active');
 const PORT = 3000;
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

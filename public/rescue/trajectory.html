@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Risk Trajectory | SurakshaNER</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #061b10;
+      --header-bg: #07130d;
+      --panel: #172d23;
+      --panel-inner: #123e2f;
+      --border: #315446;
+      --text: #f5f7f6;
+      --muted: #8eaaa0;
+      --green: #2ecc71;
+      --orange: #f39c12;
+      --red: #e74c3c;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    header {
+      min-height: 76px;
+      padding: 12px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      background: var(--header-bg);
+      border-bottom: 1px solid #1b3027;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 21px;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .header-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 26px;
+    }
+
+    .header-nav a,
+    .back-link {
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .header-nav a:hover,
+    .back-link:hover {
+      color: var(--green);
+    }
+
+    .page-wrapper {
+      padding: 26px 33px 40px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 48px;
+      font-size: 21px;
+    }
+
+    .page-title {
+      margin: 0 0 12px;
+      font-size: 30px;
+    }
+
+    .page-description {
+      margin: 0 0 34px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card,
+    .trajectory-panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+    }
+
+    .summary-card {
+      padding: 22px;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .summary-value {
+      margin-top: 12px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .trajectory-panel {
+      padding: 24px;
+    }
+
+    .trajectory-panel h2 {
+      margin: 0 0 20px;
+      font-size: 21px;
+    }
+
+    #trajectory-list {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .trajectory-card {
+      padding: 20px;
+      background: var(--panel-inner);
+      border: 1px solid #2b5b49;
+      border-left: 5px solid var(--green);
+      border-radius: 12px;
+    }
+
+    .zone-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .projected-score {
+      font-size: 27px;
+      font-weight: 700;
+      margin: 8px 0;
+    }
+
+    .projected-level {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .level-low {
+      color: #baf5cf;
+      background: #155b37;
+    }
+
+    .level-medium {
+      color: #ffe0a3;
+      background: #765019;
+    }
+
+    .level-high {
+      color: #ffd0cc;
+      background: #76251f;
+    }
+
+    .explanation {
+      margin-top: 14px;
+      color: #b5cbc1;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .trend-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 9px 0;
+      border-bottom: 1px solid #2b5b49;
+      font-size: 14px;
+    }
+
+    .trend-row:last-child {
+      border-bottom: none;
+    }
+
+    .positive {
+      color: var(--red);
+    }
+
+    .negative {
+      color: var(--green);
+    }
+
+    .neutral {
+      color: var(--muted);
+    }
+
+    .empty-message {
+      padding: 22px;
+      color: var(--muted);
+      background: var(--panel-inner);
+      border: 1px solid #2b5b49;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 850px) {
+      .summary-grid,
+      #trajectory-list {
+        grid-template-columns: 1fr;
+      }
+
+      header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .page-wrapper {
+        padding: 22px 16px 30px;
+      }
+
+      header {
+        padding: 14px 18px;
+      }
+
+      .back-link {
+        margin-bottom: 32px;
+        font-size: 18px;
+      }
+
+      .page-title {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="brand">
+      <h1>SurakshaNER</h1>
+      <p>भूस्खलन पूर्व चेतावनी प्रणाली · Disaster Management, NER</p>
+    </div>
+
+    <nav class="header-nav">
+      <a href="/">Home</a>
+      <a href="/citizen/">Citizen Portal</a>
+      <a href="/rescue/">Rescue &amp; Authority</a>
+    </nav>
+  </header>
+
+  <main class="page-wrapper">
+    <a class="back-link" href="/rescue/">
+      ← Back to Dashboard
+    </a>
+
+    <h1 class="page-title">Risk Trajectory</h1>
+
+    <p class="page-description">
+      Six-hour projected risk trends based on recent sensor, rainfall, and satellite scores.
+    </p>
+
+    <section class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">Zones With Projections</div>
+        <div class="summary-value" id="zones-count">0</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Highest Projected Risk</div>
+        <div class="summary-value" id="highest-risk">—</div>
+      </div>
+
+      <div class="summary-card">
+        <div class="summary-label">Last Updated</div>
+        <div class="summary-value" id="last-updated">—</div>
+      </div>
+    </section>
+
+    <section class="trajectory-panel">
+      <h2>Zone Projections</h2>
+
+      <div id="trajectory-list">
+        <p class="empty-message">
+          Loading risk trajectory data...
+        </p>
+      </div>
+    </section>
+  </main>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/rescue/risk-trajectory.js"></script>
+</body>
+</html>

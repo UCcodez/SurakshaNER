@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>In-Danger Alerts — SurakshaNER</title>
+  <link rel="stylesheet" href="/style.css">
+
+  <style>
+    body.rescue-page {
+      background: #071a0d;
+      color: #ffffff;
+    }
+
+    h1 {
+      padding: 0 24px;
+      color: #ffffff !important;
+    }
+
+    .panel {
+      background: #162c23;
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    #inDangerList {
+      color: #ffffff;
+    }
+
+    #inDangerList * {
+      color: #ffffff;
+    }
+  </style>
+</head>
+
+<body class="rescue-page">
+  <script>
+    window.NAV_BASE = '../';
+    window.NAV_CURRENT = 'rescue';
+  </script>
+
+  <div id="site-navbar"></div>
+
+  <div style="padding: 16px 24px;">
+    <a href="/rescue/rescue.html" style="color:#f3f6f4;">
+      &larr; Back to Dashboard
+    </a>
+  </div>
+
+  <h1>In-Danger Alerts</h1>
+
+  <div class="rescue-grid">
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div id="inDangerList">Loading...</div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/navbar.js"></script>
+
+  <script>
+    const socket = io();
+
+    async function loadInDangerList() {
+      const container = document.getElementById('inDangerList');
+
+      try {
+        const res = await fetch('/api/in-danger');
+
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}`);
+        }
+
+        const alerts = await res.json();
+        const active = alerts.filter(alert => alert.status === 'active');
+
+        if (active.length === 0) {
+          container.innerHTML = '<p>No active in-danger alerts.</p>';
+          return;
+        }
+
+        container.innerHTML = active.map(alert => `
+          <div class="sos-item" style="border-left: 4px solid #e74c3c; padding: 12px; margin-bottom: 10px;">
+            <strong>⚠ IN DANGER — Alert #${alert.id}</strong>
+
+            <div class="sos-meta">
+              ${new Date(alert.created_at).toLocaleString()}
+              · (${Number(alert.lat).toFixed(4)}, ${Number(alert.lng).toFixed(4)})
+            </div>
+
+            <button
+              onclick="resolveInDanger(${alert.id})"
+              style="
+                margin-top: 8px;
+                background: #2ecc71;
+                color: #ffffff;
+                border: none;
+                padding: 6px 14px;
+                border-radius: 6px;
+                cursor: pointer;
+              "
+            >
+              Mark Resolved
+            </button>
+          </div>
+        `).join('');
+
+      } catch (error) {
+        console.error('Failed to load in-danger alerts:', error);
+        container.innerHTML = '<p>Failed to load in-danger alerts.</p>';
+      }
+    }
+
+    async function resolveInDanger(id) {
+      await fetch(`/api/in-danger/${id}/resolve`, {
+        method: 'POST'
+      });
+
+      loadInDangerList();
+    }
+
+    socket.on('newInDanger', loadInDangerList);
+    socket.on('inDangerResolved', loadInDangerList);
+
+    loadInDangerList();
+  </script>
+</body>
+</html>

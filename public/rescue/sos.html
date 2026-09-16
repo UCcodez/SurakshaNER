@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SOS Alerts — SurakshaNER</title>
+  <link rel="stylesheet" href="/style.css" />
+
+  <style>
+    body.rescue-page {
+      background: #071a0d !important;
+      color: #d9d9d9 !important;
+    }
+
+    body.rescue-page h1 {
+      color: #17352b !important;
+      padding: 0 24px;
+    }
+
+    body.rescue-page a {
+      color: #ebf1ee !important;
+    }
+
+    #sosList {
+      background: #163c2e !important;
+      color: #ffffff !important;
+      border: 1px solid #285442;
+      border-radius: 12px;
+      padding: 18px;
+      min-height: 24px;
+    }
+
+    #sosList * {
+      color: #ffffff !important;
+    }
+  </style>
+</head>
+<body class="rescue-page">
+  <script>window.NAV_BASE = '../'; window.NAV_CURRENT = 'rescue';</script>
+  <div id="site-navbar"></div>
+
+  <div style="padding: 16px 24px;">
+    <a href="/rescue/rescue.html" style="color:#7fa08c; text-decoration:none;">&larr; Back to Dashboard</a>
+  </div>
+
+  <h1 style="padding: 0 24px; color:#ffffff !important;" >Active SOS Alerts</h1>
+
+  <div class="rescue-grid">
+    <div class="panel" style="grid-column: 1 / -1;">
+      <div id="sosList">Loading...</div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/navbar.js"></script>
+  <script>
+  const socket = io();
+
+  async function loadSOSList() {
+    const container = document.getElementById('sosList');
+
+    try {
+      const res = await fetch('/api/sos');
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const alerts = await res.json();
+
+      alerts.sort(
+        (a, b) => Number(b.priority_score || 0) - Number(a.priority_score || 0)
+      );
+
+      if (alerts.length === 0) {
+        container.innerHTML = `
+          <p style="color:#ffffff;">No active alerts.</p>
+        `;
+        return;
+      }
+
+      container.innerHTML = alerts.map(a => `
+        <div class="sos-item">
+          <strong>
+            SOS #${a.id} —
+            Priority ${Number(a.priority_score || 0).toFixed(1)}
+          </strong>
+          — ${a.message || 'No message'}
+
+          <div class="sos-meta">
+            ${a.created_at ? new Date(a.created_at).toLocaleString() : ''}
+            · (${Number(a.lat).toFixed(4)}, ${Number(a.lng).toFixed(4)})
+            · ${a.victim_count || 0}
+            ${Number(a.victim_count) === 1 ? 'person' : 'people'}
+            · ${a.vulnerability !== 'none' ? (a.vulnerability || '') : ''}
+          </div>
+
+          <select onchange="updateStatus(${a.id}, this.value)">
+            <option value="open" ${a.status === 'open' ? 'selected' : ''}>
+              Open
+            </option>
+            <option value="assigned" ${a.status === 'assigned' ? 'selected' : ''}>
+              Assigned
+            </option>
+            <option value="resolved" ${a.status === 'resolved' ? 'selected' : ''}>
+              Resolved
+            </option>
+          </select>
+
+          <select onchange="updateSeverity(${a.id}, this.value)">
+            <option value="low" ${a.severity === 'low' ? 'selected' : ''}>
+              Low severity
+            </option>
+            <option value="medium" ${a.severity === 'medium' ? 'selected' : ''}>
+              Medium severity
+            </option>
+            <option value="high" ${a.severity === 'high' ? 'selected' : ''}>
+              High severity
+            </option>
+          </select>
+        </div>
+      `).join('');
+
+    } catch (error) {
+      console.error('Failed to load SOS alerts:', error);
+
+      container.innerHTML = `
+        <p style="color:#ffb4ab;">
+          Failed to load SOS alerts. Check the server console.
+        </p>
+      `;
+    }
+  }
+
+  async function updateStatus(id, status) {
+    await fetch(`/api/sos/${id}/status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ status })
+    });
+
+    await loadSOSList();
+  }
+
+  async function updateSeverity(id, severity) {
+    await fetch(`/api/sos/${id}/severity`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ severity })
+    });
+
+    await loadSOSList();
+  }
+
+  socket.on('newSOS', () => {
+    loadSOSList();
+  });
+
+  socket.on('sosDeleted', () => {
+    loadSOSList();
+  });
+
+  loadSOSList();
+</script>
+</body>
+</html>

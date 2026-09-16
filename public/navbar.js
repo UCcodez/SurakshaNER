@@ -42,11 +42,11 @@ function renderNavbar() {
               <span class="modal-action-title">Find Shelter</span>
               <span class="modal-action-desc">See nearest relief points and capacity</span>
             </div>
-          <a href="${base}citizen/citizen.html#lostFoundSection" class="modal-action-btn">
+          <!--<a href="${base}citizen/citizen.html#lostFoundSection" class="modal-action-btn">
             <span class="modal-action-title">Lost &amp; Found</span>
             <span class="modal-action-desc">Report or search for missing people.</span>
-          </a>
-        </div>
+          </a>-->
+        </div> 
       </div>
     </div>
   `;

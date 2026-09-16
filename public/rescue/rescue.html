@@ -13,7 +13,59 @@
 
   <h1 style="padding: 0 24px;">Rescue Agency Dashboard</h1>
 
+  <div class="rescue-content-grid">
+  <div class="rescue-main-col">
+
+  <section class="rescue-map-section">
+  <div class="map-search-header">
+    <div>
+      <!-- <p class="map-eyebrow">LOCATION INTELLIGENCE</p> -->
+      <h2>Search monitored locations</h2>
+      <p class="map-search-subtitle">
+        Find and inspect currently monitored rescue zones.
+      </p>
+    </div>
+  </div>
+
+  <div class="map-search-box">
+    <input
+      type="search"
+      id="rescueLocationSearch"
+      placeholder="Search here"
+      autocomplete="off"
+    />
+    <button id="rescueLocationSearchBtn" type="button">
+      Search
+    </button>
+  </div>
+
+  <p id="rescueSearchMessage" class="rescue-search-message"></p>
+
+  <div class="recent-search-heading">
+    <h3>Recent searches</h3>
+    <span>Monitored locations</span>
+  </div>
+
+  <div id="recentLocationTiles" class="recent-location-tiles">
+    <button class="recent-location-tile" data-location="guwahati">
+      <div>
+        <strong>Guwahati</strong>
+        <span>Assam, India</span>
+      </div>
+      <small id="guwahatiTileRisk">Loading...</small>
+    </button>
+
+    <button class="recent-location-tile" data-location="shillong">
+      <div>
+        <strong>Shillong</strong>
+        <span>Meghalaya, India</span>
+      </div>
+      <small id="shillongTileRisk">Loading...</small>
+    </button>
+  </div>
+
   <div id="rescueMap"></div>
+</section>
 
   <section class="ai-risk-dashboard">
     <div class="ai-dashboard-header">
@@ -104,70 +156,71 @@
         </div>
       </div>
     </div>
+
+        <div class="ai-panel" style="margin-top:16px;">
+      <h3>Demo Controls</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+        <button class="post-btn" onclick="setDemoMode('sensor-focus')">Sensor Focus Mode</button>
+        <button class="post-btn" onclick="setDemoMode('normal')">Normal Mode</button>
+        <button class="post-btn" onclick="triggerRainfallSpike()">Trigger Rainfall Spike</button>
+        <button class="post-btn" onclick="triggerSatelliteSpike()">Trigger Satellite Spike</button>
+        <button class="post-btn" onclick="resetDemo()" style="background:#e74c3c;">Reset Demo</button>
+      </div>
+    </div>
   </section>
 
-  
+  </div>
 
-  <div class="rescue-grid">
-    <div class="panel">
-      <h2>Post Announcement</h2>
-      <div class="form-group">
-        <label>Title</label>
-        <input type="text" id="annTitle" placeholder="e.g. Heavy Rainfall Warning" />
-      </div>
-      <div class="form-group">
-        <label>Message</label>
-        <textarea id="annBody" rows="4" placeholder="Details for citizens..."></textarea>
-      </div>
-      <button class="post-btn" onclick="postAnnouncement()">Post Announcement</button>
-      <div id="annStatus" style="margin-top:8px; font-size:13px; color:#7fa08c;"></div>
+  <aside class="rescue-ops-sidebar">
+    <h2 class="rescue-ops-sidebar-title">Rescue Operations</h2>
+    <div class="tiles-stack">
+      <a href="/rescue/announcements.html" class="ops-tile">
+        <div class="ops-tile-label">Announcements</div>
+        <div class="ops-tile-sub">post &amp; view outbox</div>
+      </a>
+      <a href="/rescue/in-danger.html" class="ops-tile ops-tile-critical" id="tileInDangerCard">
+        <div class="ops-tile-label">In Danger</div>
+        <div class="ops-tile-count" id="tileDangerCount">--</div>
+        <div class="ops-tile-sub">active</div>
+      </a>
+      <a href="/rescue/sos.html" class="ops-tile ops-tile-critical" id="tileSOSCard">
+        <div class="ops-tile-label">SOS Alerts</div>
+        <div class="ops-tile-count" id="tileSOSCount">--</div>
+        <div class="ops-tile-sub">active</div>
+      </a>
+      <a href="/rescue/hazards.html" class="ops-tile">
+        <div class="ops-tile-label">Hazard Reports</div>
+        <div class="ops-tile-count" id="tileHazardCount">--</div>
+        <div class="ops-tile-sub">open</div>
+      </a>
+      <a href="/rescue/roads.html" class="ops-tile">
+        <div class="ops-tile-label">Road Connectivity</div>
+        <div class="ops-tile-count" id="tileRoadCount">--</div>
+        <div class="ops-tile-sub">at risk / blocked</div>
+      </a>
+      <a href="/rescue/trajectory.html" class="ops-tile">
+        <div class="ops-tile-label">Risk Trajectory</div>
+        <div class="ops-tile-sub">6hr projection</div>
+      </a>
+      <a href="#" class="ops-tile ops-tile-placeholder" onclick="return false;">
+        <div class="ops-tile-label">Shelter Info</div>
+        <div class="ops-tile-sub">coming soon</div>
+      </a>
     </div>
+  </aside>
 
-    <div class="panel">
-      <h2>Active SOS Alerts</h2>
-      <div id="sosList">Loading...</div>
-    </div>
+  </div>
 
-    <div class="panel">
-      <h2>Road Connectivity</h2>
-      <div id="roadList">Loading...</div>
-    </div>
-
-    <div class="panel">
-      <h2> SMS / IVR Outbox</h2>
-      <div id="smsPanel"><p style="color:#7fa08c">No alerts sent yet.</p></div>
-    </div>
-
-    <div class="panel">
-      <h2>In Danger</h2>
-      <div id="inDangerList">Loading...</div>
-    </div>
-
-    <div class="panel">
-      <h2>Tiered Alerts</h2>
-      <div id="tieredAlertsList"><p style="color:#7fa08c">No tiered alerts yet.</p></div>
-    </div>
-
-    <div class="panel">
-      <h2>Risk Trajectory (6hr Projection)</h2>
-      <div id="trajectoryList"><p style="color:#7fa08c">Waiting for enough history to project a trend...</p></div>
-    </div>
-
-    <div class="panel" style="grid-column: span 2;">
-      <h2>Field Reports</h2>
-      <div id="photoReportsList">Loading...</div>
-    </div>
-
-    <div class="panel">
+  <!-- <div class="panel">
       <h2>Lost &amp; Found</h2>
       <div id="lostFoundManage">Loading...</div>
-    </div>
+    </div> -->
 
     <!-- <div class="panel" style="grid-column: 1 / -1;">
       <h2>Demo Controls</h2>
       <div id="demoControls">Loading...</div>
-    </div>
-  </div> -->
+    </div>-->
+  
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="/socket.io/socket.io.js"></script>

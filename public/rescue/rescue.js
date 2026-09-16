@@ -27,6 +27,199 @@ const riskColors = { low: '#2ecc71', medium: '#f39c12', high: '#e74c3c' };
 const zoneMarkers = {};
 const zoneData = {};
 
+// ==========================================
+// RESCUE PORTAL LOCATION SEARCH
+// ==========================================
+
+const monitoredLocations = {
+  guwahati: {
+    name: 'Guwahati',
+    aliases: ['guwahati', 'kamrup'],
+    lat: 26.1445,
+    lng: 91.7362,
+    zoom: 11
+  },
+
+  shillong: {
+    name: 'Shillong',
+    aliases: ['shillong', 'east khasi hills'],
+    lat: 25.5788,
+    lng: 91.8933,
+    zoom: 11
+  }
+};
+
+let recentLocationOrder = ['guwahati', 'shillong'];
+
+function findMonitoredLocation(searchText) {
+  const query = searchText.trim().toLowerCase();
+
+  if (!query) return null;
+
+  return Object.entries(monitoredLocations).find(([, location]) =>
+    location.aliases.some(alias =>
+      alias === query ||
+      alias.includes(query) ||
+      query.includes(alias)
+    )
+  );
+}
+
+function findZoneForLocation(locationKey) {
+  const location = monitoredLocations[locationKey];
+
+  if (!location) return null;
+
+  return Object.values(zoneData).find(zone => {
+    const searchableText = [
+      zone.name,
+      zone.city,
+      zone.location,
+      zone.district
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return location.aliases.some(alias =>
+      searchableText.includes(alias)
+    );
+  });
+}
+
+function focusRescueLocation(locationKey) {
+  const location = monitoredLocations[locationKey];
+
+  if (!location || typeof map === 'undefined') {
+    console.warn('Map or location not available:', locationKey);
+    return;
+  }
+
+  map.flyTo(
+    [location.lat, location.lng],
+    location.zoom,
+    { duration: 1.2 }
+  );
+
+  const matchingZone = findZoneForLocation(locationKey);
+
+  if (matchingZone && zoneMarkers[matchingZone.id]) {
+    setTimeout(() => {
+      zoneMarkers[matchingZone.id].openPopup();
+    }, 1200);
+  }
+
+  updateRecentLocationOrder(locationKey);
+}
+
+function updateRecentLocationOrder(selectedKey) {
+  recentLocationOrder = [
+    selectedKey,
+    ...recentLocationOrder.filter(key => key !== selectedKey)
+  ];
+
+  renderRecentLocationTiles();
+}
+
+function renderRecentLocationTiles() {
+  const container = document.getElementById('recentLocationTiles');
+
+  if (!container) return;
+
+  container.innerHTML = recentLocationOrder
+    .map(locationKey => {
+      const location = monitoredLocations[locationKey];
+      const zone = findZoneForLocation(locationKey);
+
+      const riskText = zone
+        ? `${Number(zone.risk_score ?? 0).toFixed(1)} · ${zone.risk_level ?? 'Unknown'}`
+        : 'No live data';
+
+      return `
+        <button
+          type="button"
+          class="recent-location-tile"
+          data-location="${locationKey}"
+        >
+          <div>
+            <strong>${location.name}</strong>
+            <span>
+              ${locationKey === 'guwahati'
+                ? 'Assam, India'
+                : 'Meghalaya, India'}
+            </span>
+          </div>
+          <small>${riskText}</small>
+        </button>
+      `;
+    })
+    .join('');
+}
+
+// Event delegation: works even after tiles are rebuilt
+document
+  .getElementById('recentLocationTiles')
+  ?.addEventListener('click', event => {
+    const tile = event.target.closest('.recent-location-tile');
+
+    if (!tile) return;
+
+    const locationKey = tile.dataset.location;
+    const location = monitoredLocations[locationKey];
+
+    if (!location) return;
+
+    const input = document.getElementById('rescueLocationSearch');
+    const message = document.getElementById('rescueSearchMessage');
+
+    if (input) {
+      input.value = location.name;
+    }
+
+    if (message) {
+      message.textContent =
+        `Showing monitored location: ${location.name}`;
+    }
+
+    focusRescueLocation(locationKey);
+  });
+
+function searchRescueLocation() {
+  const input = document.getElementById('rescueLocationSearch');
+  const message = document.getElementById('rescueSearchMessage');
+
+  if (!input || !message) return;
+
+  const result = findMonitoredLocation(input.value);
+
+  if (!result) {
+    message.textContent =
+      'Enter Guwahati or Shillong to search.';
+    return;
+  }
+
+  const [locationKey, location] = result;
+
+  message.textContent =
+    `Showing monitored location: ${location.name}`;
+
+  focusRescueLocation(locationKey);
+}
+
+document
+  .getElementById('rescueLocationSearchBtn')
+  ?.addEventListener('click', searchRescueLocation);
+
+document
+  .getElementById('rescueLocationSearch')
+  ?.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      searchRescueLocation();
+    }
+  });
+
+renderRecentLocationTiles();
+
 let riskHeatmap = null;
 
 const sosMarkers = {};
@@ -72,16 +265,17 @@ function updateRiskHeatmap() {
 
   if (!riskHeatmap) {
     riskHeatmap = L.heatLayer(points, {
-      radius: 35,
-      blur: 25,
-      maxZoom: 12,
-      minOpacity: 0.35,
+      radius: 55,
+      blur: 35,
+      maxZoom: 10,
+      minOpacity: 0.55,
+      max: 1.0,
       gradient: {
-        0.00: '#2ecc71',
-        0.35: '#f1c40f',
-        0.60: '#f39c12',
-        0.80: '#e67e22',
-        1.00: '#e74c3c'
+        0.00: '#1abc4c',
+        0.25: '#f1e740',
+        0.50: '#ff9f1c',
+        0.75: '#ff4d29',
+        1.00: '#c0392b'
       }
     });
 
@@ -109,37 +303,27 @@ socket.on('initialZones', (zones) => {
   });
 
   updateRiskHeatmap();
-  // updateRiskStrip();
+  updateAIDashboard();
+  renderRecentLocationTiles();
 });
 
 socket.on('zoneUpdate', update => {
   zoneData[update.zoneId] = {
     ...zoneData[update.zoneId],
-
     risk_score: Number(update.riskScore),
     risk_level: update.riskLevel,
-
-    sensor_risk_score:
-      update.sensorRiskScore !== undefined
-        ? Number(update.sensorRiskScore)
-        : zoneData[update.zoneId]?.sensor_risk_score ?? 0,
-
-    rainfall_score:
-      update.rainfallScore !== undefined
-        ? Number(update.rainfallScore)
-        : zoneData[update.zoneId]?.rainfall_score ?? 0,
-
-    satellite_score:
-      update.satelliteScore !== undefined
-        ? Number(update.satelliteScore)
-        : zoneData[update.zoneId]?.satellite_score ?? 0,
-
+    sensor_risk_score: update.sensorRiskScore !== undefined ? Number(update.sensorRiskScore) : zoneData[update.zoneId]?.sensor_risk_score ?? 0,
+    rainfall_score: update.rainfallScore !== undefined ? Number(update.rainfallScore) : zoneData[update.zoneId]?.rainfall_score ?? 0,
+    satellite_score: update.satelliteScore !== undefined ? Number(update.satelliteScore) : zoneData[update.zoneId]?.satellite_score ?? 0,
+    recommended_action: update.recommendedAction,
+    scenario: update.scenario,
     updated_at: new Date().toISOString()
   };
 
   renderZone(zoneData[update.zoneId]);
   updateRiskHeatmap();
   updateAIDashboard();
+  renderRecentLocationTiles();
 });
 
 socket.on('newSOS', (alert) => {
@@ -441,6 +625,8 @@ async function loadLostFoundManage() {
 function renderLostFoundManage() {
   const container = document.getElementById('lostFoundManage');
 
+  if (!container) return;
+
   if (lostFoundManageData.length === 0) {
     container.innerHTML = '<p style="color:#7fa08c">No entries yet.</p>';
     return;
@@ -561,7 +747,7 @@ function updateAIDashboard() {
   // Confidence derived from how far the stacking model's probability sits
   // from the uncertain midpoint (50) - closer to 0 or 100 means the model
   // is more decisively confident, not an invented number.
-  const confidence = Math.round(Math.abs(topZone.risk_score - 50) * 2);
+  const confidence = Math.round(50+ Math.abs(topZone.risk_score - 50));
   confidenceElement.textContent = `${confidence}%`;
 
   const priorityCount = zones.filter(z => z.risk_level !== 'low').length;
@@ -569,15 +755,15 @@ function updateAIDashboard() {
 
   timeElement.textContent = new Date().toLocaleTimeString();
 
-  explanationElement.textContent =
-    `Combined sensor, rainfall, and satellite analysis for ${topZone.name} indicates ${topZone.risk_level} risk conditions.`;
-
-  recommendationElement.textContent =
-    topZone.risk_level === 'high'
-      ? 'Issue a warning and prepare rescue teams for rapid deployment.'
-      : topZone.risk_level === 'medium'
-      ? 'Monitor closely and prepare contingency resources.'
-      : 'Continue routine monitoring.';
+  
+  recommendationElement.textContent = topZone.recommended_action || 'Continue routine monitoring.';
+  explanationElement.textContent = topZone.scenario === 'multi-source'
+    ? `Multiple independent sources (sensor, rainfall, satellite) confirm elevated risk in ${topZone.name}.`
+    : topZone.scenario === 'single-source'
+    ? `A single source shows anomalous readings in ${topZone.name} — cross-source confirmation pending.`
+    : topZone.risk_level !== 'low'
+    ? `Rising indicators detected in ${topZone.name} — monitoring closely.`
+    : `Conditions in ${topZone.name} are within normal ranges.`;
 
   setAIFactor('aiSensorValue', 'aiSensorBar', topZone.sensor_risk_score ?? 0);
   setAIFactor('aiRainfallValue', 'aiRainfallBar', topZone.rainfall_score ?? 0);
@@ -585,4 +771,75 @@ function updateAIDashboard() {
 
   const statusElement = document.getElementById('aiModelStatus');
   if (statusElement) statusElement.textContent = 'Live';
+}
+
+async function setDemoMode(mode) {
+  await fetch('/api/demo/mode', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode })
+  });
+}
+
+async function triggerRainfallSpike() {
+  await fetch('/api/demo/spike-rainfall', { method: 'POST' });
+}
+
+async function triggerSatelliteSpike() {
+  await fetch('/api/demo/spike-satellite', { method: 'POST' });
+}
+
+async function resetDemo() {
+  await fetch('/api/demo/reset', { method: 'POST' });
+}
+
+function setCriticalTileState(cardId, activeCount) {
+  const card = document.getElementById(cardId);
+  if (!card) return;
+  card.classList.toggle('ops-tile-active', activeCount > 0);
+}
+
+async function refreshTileCounts() {
+  try {
+    const res = await fetch('/api/sos');
+    const alerts = await res.json();
+    const activeCount = alerts.filter(a => a.status !== 'resolved').length;
+    const el = document.getElementById('tileSOSCount');
+    if (el) el.textContent = activeCount;
+    setCriticalTileState('tileSOSCard', activeCount);
+  } catch (e) {}
+
+  try {
+    const res = await fetch('/api/photo-reports');
+    const reports = await res.json();
+    const el = document.getElementById('tileHazardCount');
+    if (el) el.textContent = reports.length;
+  } catch (e) {}
+
+  try {
+    const res = await fetch('/api/in-danger');
+    const alerts = await res.json();
+    const activeCount = alerts.filter(a => a.status === 'active').length;
+    const el = document.getElementById('tileDangerCount');
+    if (el) el.textContent = activeCount;
+    setCriticalTileState('tileInDangerCard', activeCount);
+  } catch (e) {}
+
+  try {
+    const res = await fetch('/api/roads');
+    const roads = await res.json();
+    const el = document.getElementById('tileRoadCount');
+    if (el) el.textContent = roads.filter(r => r.status !== 'clear').length;
+  } catch (e) {}
+}
+
+if (document.getElementById('tileSOSCount')) {
+  refreshTileCounts();
+  socket.on('newSOS', refreshTileCounts);
+  socket.on('sosDeleted', refreshTileCounts);
+  socket.on('sosStatusUpdate', refreshTileCounts);
+  socket.on('newPhotoReport', refreshTileCounts);
+  socket.on('newInDanger', refreshTileCounts);
+  socket.on('inDangerResolved', refreshTileCounts);
+  socket.on('roadStatusUpdate', refreshTileCounts);
 }
