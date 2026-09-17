@@ -111,11 +111,85 @@
   </div> -->
 </div>
 
+  <!-- DOST assistance notification panel -->
+  <aside id="dost-panel" class="dost-panel" aria-label="DOST assistance panel">
+    <div class="dost-header">
+      <div>
+        <div class="dost-kicker">SurakshaNER</div>
+        <h2>DOST</h2>
+        <!-- <p>Assistance</p> -->
+      </div>
+      <button id="dost-close" class="dost-close" type="button" aria-label="Close DOST">&times;</button>
+    </div>
+
+    <div class="dost-body">
+      <div class="dost-welcome">Hello! I’m DOST. How can I help you right now?</div>
+      <h3>Suggested questions</h3>
+      <div class="dost-suggestions">
+        <button type="button" data-dost-question="What should I do during a landslide?">What should I do during a landslide?</button>
+        <button type="button" data-dost-question="Where is the nearest shelter?">Where is the nearest shelter?</button>
+        <button type="button" data-dost-question="How do I report a hazard?">How do I report a hazard?</button>
+      </div>
+
+      <h3>Quick actions</h3>
+      <div class="dost-actions dost-actions-row">
+        <button type="button" class="dost-action" id="dost-help">☎ <span>Call for Help</span></button>
+        <button type="button" class="dost-action dost-action-sos" id="dost-sos">⚠ <span>Send SOS</span></button>
+        <button type="button" class="dost-action" id="dost-ask">✦ <span>Ask a Question</span></button>
+      </div>
+
+      <div id="dost-messages" class="dost-messages" aria-live="polite"></div>
+    </div>
+    <form id="dost-form" class="dost-input-row">
+      <input id="dost-input" type="text" placeholder="Type your question..." aria-label="Ask DOST a question">
+      <button type="submit" aria-label="Send question">➤</button>
+    </form>
+  </aside>
+  <button id="dost-open" class="dost-open" type="button" aria-label="Open DOST assistance">DOST</button>
+
   <script src="/translations.js"></script>
   <script src="/offline-queue.js"></script>
   <script src="/navbar.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="/citizen/citizen.js"></script>
+  <script>
+    (function () {
+      const panel = document.getElementById('dost-panel');
+      const close = document.getElementById('dost-close');
+      const open = document.getElementById('dost-open');
+      const form = document.getElementById('dost-form');
+      const input = document.getElementById('dost-input');
+      const messages = document.getElementById('dost-messages');
+
+      function addMessage(text, who) {
+        const item = document.createElement('div');
+        item.className = 'dost-message ' + (who || 'bot');
+        item.textContent = text;
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+      }
+      function ask(question) {
+        if (!question) return;
+        addMessage(question, 'user');
+        const answer = question.toLowerCase().includes('landslide')
+          ? 'Move away from slopes and unstable ground, follow official alerts, and avoid crossing debris.'
+          : question.toLowerCase().includes('shelter')
+          ? 'Demo response: nearby shelters will appear here once location services and the rescue database are connected.'
+          : question.toLowerCase().includes('hazard')
+          ? 'Use the Report a Hazard section on this page to submit details and media.'
+          : 'This is a demo response from DOST. A live assistance service will provide verified guidance here.';
+        setTimeout(() => addMessage(answer, 'bot'), 250);
+      }
+      close.addEventListener('click', () => { panel.classList.add('is-closed'); open.classList.add('is-visible'); });
+      open.addEventListener('click', () => { panel.classList.remove('is-closed'); open.classList.remove('is-visible'); });
+      document.querySelectorAll('[data-dost-question]').forEach(btn => btn.addEventListener('click', () => ask(btn.dataset.dostQuestion)));
+      form.addEventListener('submit', e => { e.preventDefault(); const value = input.value.trim(); input.value = ''; ask(value); });
+      document.getElementById('dost-help').addEventListener('click', () => addMessage('Demo action: connecting you to emergency assistance.', 'bot'));
+      document.getElementById('dost-sos').addEventListener('click', () => { addMessage('Demo action: SOS prepared. Use the main SEND SOS ALERT button to submit the real alert.', 'bot'); document.getElementById('sosBtn')?.focus(); });
+      document.getElementById('dost-ask').addEventListener('click', () => input.focus());
+    })();
+  </script>
+
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js').then(() => {
