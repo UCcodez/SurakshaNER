@@ -112,14 +112,14 @@ function focusRescueLocation(locationKey) {
   updateRecentLocationOrder(locationKey);
 }
 
-function updateRecentLocationOrder(selectedKey) {
-  recentLocationOrder = [
-    selectedKey,
-    ...recentLocationOrder.filter(key => key !== selectedKey)
-  ];
+// function updateRecentLocationOrder(selectedKey) {
+//   recentLocationOrder = [
+//     selectedKey,
+//     ...recentLocationOrder.filter(key => key !== selectedKey)
+//   ];
 
-  renderRecentLocationTiles();
-}
+//   renderRecentLocationTiles();
+// }
 
 function renderRecentLocationTiles() {
   const container = document.getElementById('recentLocationTiles');
