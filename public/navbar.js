@@ -5,18 +5,23 @@ function renderNavbar() {
   const navHTML = `
     <div class="tricolor-strip"></div>
     <header class="site-header">
-      <div class="brand-block">
-        <a href="${base}index.html" class="nav-brand">SurakshaNER</a>
-        <div class="nav-tagline">भूस्खलन पूर्व चेतावनी प्रणाली &middot; Disaster Management, NER</div>
+      <div class="brand-wrap">
+        <span class="nav-logo" aria-hidden="true"><!-- icon: mountain-shield --></span>
+        <div class="brand-block">
+          <a href="${base}index.html" class="nav-brand">SurakshaNER</a>
+          <div class="nav-tagline">भूस्खलन पूर्व चेतावनी प्रणाली &middot; Disaster Management, NER</div>
+        </div>
       </div>
       <div class="nav-right">
         <div class="nav-links">
           <a href="${base}index.html" data-i18n="navHome" class="${current === 'home' ? 'active' : ''}" >Home</a>
           <a href="${base}citizen/citizen.html" data-i18n="navCitizen" class="${current === 'citizen' ? 'active' : ''}" data-i18n="navCitizen">Citizen Portal</a>
           <a href="${base}rescue/rescue.html" data-i18n="navRescue" class="${current === 'rescue' ? 'active' : ''}" data-i18n="navRescue" >Rescue &amp; Authority</a>
+          <a href="${base}research/research.html" data-i18n="navResearch" class="${current === 'research' ? 'active' : ''}" data-i18n="navResearch" >Research &amp; Inspection</a>
         </div>
-        <div id="weather-chip" class="weather-chip">Loading weather…</div>
+        <!--<div id="weather-chip" class="weather-chip">Loading weather…</div>-->
         <button id="emergency-btn" class="emergency-btn open-emergency-modal">Emergency Services</button>
+        <a href="#" id="download-mobile-btn" class="download-btn">Download for Mobile</a>
         <div class="lang-toggle" id="lang-toggle">EN&nbsp;|&nbsp;हिं
           
         </div>
@@ -80,7 +85,7 @@ function renderNavbar() {
     if (countdownActive) {
       clearInterval(countdownTimer);
       countdownActive = false;
-      btn.textContent = 'IN DANGER';
+      btn.textContent = 'SOS';
       return;
     }
 
@@ -116,7 +121,7 @@ function sendInDangerAlert(btn) {
         body: JSON.stringify({ lat: position.coords.latitude, lng: position.coords.longitude })
       });
       btn.textContent = 'Alert sent';
-      setTimeout(() => { btn.textContent = 'IN DANGER'; }, 3000);
+      setTimeout(() => { btn.textContent = 'SOS'; }, 3000);
     } catch (err) {
       btn.textContent = 'Failed — tap to retry';
     }
