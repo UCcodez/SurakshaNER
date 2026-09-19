@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research &amp; Inspection Portal — SurakshaNER</title>
+
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/research/research.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Source+Sans+3:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap"
+  >
+
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#1e3a30">
+</head>
+<body class="research-page">
+
+  <script>window.NAV_BASE = '../'; window.NAV_CURRENT = 'research';</script>
+  <div id="site-navbar"></div>
+
+  <div id="researcher-app">
+    <header class="researcher-header">
+      <div>
+        <span class="eyebrow">NORTHEAST INDIA · LANDSLIDE RESEARCH</span>
+        <h1>SurakshaNER Research Console</h1>
+        <p>Geospatial data, model monitoring, and experiment configuration</p>
+      </div>
+
+      <nav class="researcher-nav" aria-label="Research console sections">
+        <button class="active" data-section="overview">Workspace</button>
+        <button data-section="experiments">Experiments</button>
+        <button data-section="datasets">Datasets</button>
+        <button data-section="settings">Parameters</button>
+      </nav>
+    </header>
+
+    <section class="researcher-status" aria-label="System status">
+      <div>
+        <span class="status-label">System status</span>
+        <strong class="status-value"><span class="system-dot"></span> Operational</strong>
+      </div>
+      <div>
+        <span class="status-label">Active model</span>
+        <strong class="status-value">Domain Adaptation v0.1</strong>
+      </div>
+      <div>
+        <span class="status-label">Last evaluation</span>
+        <strong class="status-value">17 Sep 2026 · 18:20</strong>
+      </div>
+      <div>
+        <span class="status-label">Workspace</span>
+        <strong class="status-value">NER · Demo environment</strong>
+      </div>
+    </section>
+
+    <main class="researcher-content">
+      <section id="overview" class="researcher-section">
+        <h2>Research Workspace</h2>
+        <p class="section-description">
+          Northeast India landslide monitoring, dataset review, and model evaluation.
+        </p>
+
+        <div class="researcher-metrics">
+          <article class="researcher-card metric-card">
+            <span class="metric-label">Registered inventories</span>
+            <strong class="metric-value">12</strong>
+            <small>Across 8 study regions</small>
+          </article>
+
+          <article class="researcher-card metric-card">
+            <span class="metric-label">Active experiments</span>
+            <strong class="metric-value">04</strong>
+            <small>2 awaiting evaluation</small>
+          </article>
+
+          <article class="researcher-card metric-card">
+            <span class="metric-label">Latest F1-score</span>
+            <strong class="metric-value">0.78</strong>
+            <small>Illustrative benchmark</small>
+          </article>
+
+          <article class="researcher-card metric-card">
+            <span class="metric-label">Reports awaiting review</span>
+            <strong class="metric-value">27</strong>
+            <small>Field validation queue</small>
+          </article>
+        </div>
+
+        <div class="researcher-grid">
+          <article class="researcher-card">
+            <div class="card-heading">
+              <div>
+                <h3>Current research configuration</h3>
+                <p>Selected workspace parameters</p>
+              </div>
+              <span class="status-badge">Draft</span>
+            </div>
+
+            <table class="researcher-table">
+              <tbody>
+                <tr><td>Study region</td><td>Eastern Himalaya · NER</td></tr>
+                <tr><td>Primary dataset</td><td>NER Landslide Inventory v0.3</td></tr>
+                <tr><td>Base model</td><td>RoBERTa</td></tr>
+                <tr><td>Task</td><td>Domain-adapted NER</td></tr>
+                <tr><td>Last modified</td><td>17 Sep 2026, 18:42</td></tr>
+              </tbody>
+            </table>
+          </article>
+
+          <article class="researcher-card">
+            <div class="card-heading">
+              <div>
+                <h3>Recent activity</h3>
+                <p>Latest workspace events</p>
+              </div>
+            </div>
+
+            <ul id="activity-log" class="activity-log">
+              <li><strong>EXP-0024</strong><span>Experiment configuration updated</span><small>12 minutes ago</small></li>
+              <li><strong>DATA-0012</strong><span>Inventory metadata reviewed</span><small>36 minutes ago</small></li>
+              <li><strong>FIELD-0087</strong><span>Field report marked for validation</span><small>1 hour ago</small></li>
+            </ul>
+          </article>
+        </div>
+
+        <article class="researcher-card workspace-preview">
+          <div class="card-heading">
+            <div>
+              <h3>Study area preview</h3>
+              <p>Selected region: Eastern Himalaya · illustrative map layer</p>
+            </div>
+            <span class="status-badge status-complete">Layer loaded</span>
+          </div>
+
+          <div class="map-placeholder" role="img" aria-label="Illustrative map preview of the Northeast India study area">
+            <div class="map-grid-lines"></div>
+            <span class="map-label map-label-one">Sikkim</span>
+            <span class="map-label map-label-two">Assam</span>
+            <span class="map-label map-label-three">Arunachal Pradesh</span>
+            <span class="map-marker marker-one"></span>
+            <span class="map-marker marker-two"></span>
+            <span class="map-marker marker-three"></span>
+            <div class="map-legend"><span></span> Illustrative landslide locations</div>
+          </div>
+        </article>
+      </section>
+
+      <section id="experiments" class="researcher-section" hidden>
+        <h2>Experiments</h2>
+        <p class="section-description">Configure, compare, and track model experiments.</p>
+
+        <div class="researcher-card">
+          <div class="card-heading">
+            <div>
+              <h3>Experiment registry</h3>
+              <p>Saved configurations and evaluation status</p>
+            </div>
+            <span class="status-badge">4 records</span>
+          </div>
+
+          <table class="researcher-table">
+            <thead><tr><th>Experiment ID</th><th>Configuration</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>EXP-0024</td><td>RoBERTa · Domain adaptation</td><td><span class="status-badge">Draft</span></td></tr>
+              <tr><td>EXP-0023</td><td>BERT · Baseline NER</td><td><span class="status-badge status-complete">Evaluated</span></td></tr>
+              <tr><td>EXP-0022</td><td>DistilBERT · Classification</td><td><span class="status-badge status-running">Running</span></td></tr>
+              <tr><td>EXP-0021</td><td>RoBERTa · Rainfall terminology</td><td><span class="status-badge status-archived">Archived</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="researcher-card">
+          <h3>New experiment</h3>
+          <form id="experiment-form" class="parameter-form">
+            <label for="experiment-name">Experiment name</label>
+            <input type="text" id="experiment-name" name="experimentName" placeholder="e.g. Bengali disaster NER" required>
+
+            <label for="experiment-model">Base model</label>
+            <select id="experiment-model" name="baseModel">
+              <option value="bert">BERT</option>
+              <option value="roberta" selected>RoBERTa</option>
+              <option value="distilbert">DistilBERT</option>
+            </select>
+
+            <label for="experiment-task">Task</label>
+            <select id="experiment-task" name="task">
+              <option value="ner">Named Entity Recognition</option>
+              <option value="classification">Text Classification</option>
+              <option value="evaluation">Evaluation Only</option>
+            </select>
+
+            <button type="submit">Create experiment</button>
+          </form>
+          <p id="experiment-status" role="status"></p>
+        </div>
+      </section>
+
+      <section id="datasets" class="researcher-section" hidden>
+        <h2>Datasets</h2>
+        <p class="section-description">Review registered geospatial, weather, terrain, and field datasets.</p>
+
+        <div class="researcher-card">
+          <div class="card-heading">
+            <div>
+              <h3>Dataset catalogue</h3>
+              <p>Registered research data and source metadata</p>
+            </div>
+            <span class="status-badge">12 datasets</span>
+          </div>
+
+          <table class="researcher-table">
+            <thead><tr><th>Dataset</th><th>Type</th><th>Coverage</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>NER Landslide Inventory v0.3</td><td>GeoJSON</td><td>Regional</td><td><span class="status-badge status-complete">Verified</span></td></tr>
+              <tr><td>Eastern Himalaya DEM</td><td>GeoTIFF</td><td>Sub-regional</td><td><span class="status-badge">Indexed</span></td></tr>
+              <tr><td>IMD Rainfall Grid Sample</td><td>NetCDF</td><td>District-wise</td><td><span class="status-badge">Imported</span></td></tr>
+              <tr><td>Field Validation Reports</td><td>PDF / KMZ</td><td>Route-wise</td><td><span class="status-badge status-reviewing">Reviewing</span></td></tr>
+            </tbody>
+          </table>
+
+          <div class="dataset-actions">
+            <button id="register-dataset">Register dataset</button>
+            <button type="button" class="secondary-button" id="export-catalogue">Export catalogue</button>
+          </div>
+          <p id="dataset-status" role="status"></p>
+        </div>
+
+        <div class="researcher-grid">
+          <article class="researcher-card">
+            <h3>Data coverage</h3>
+            <div class="coverage-row"><span>Terrain layers</span><strong>86%</strong></div>
+            <div class="coverage-bar"><span style="width:86%"></span></div>
+            <div class="coverage-row"><span>Rainfall records</span><strong>72%</strong></div>
+            <div class="coverage-bar"><span style="width:72%"></span></div>
+            <div class="coverage-row"><span>Field validation</span><strong>48%</strong></div>
+            <div class="coverage-bar"><span style="width:48%"></span></div>
+          </article>
+
+          <article class="researcher-card">
+            <h3>Supported formats</h3>
+            <div class="format-list">
+              <span>GeoJSON</span><span>GeoTIFF</span><span>Shapefile</span><span>Parquet</span><span>NetCDF</span><span>CSV</span><span>PDF</span><span>KMZ</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="settings" class="researcher-section" hidden>
+        <h2>Parameters</h2>
+        <p class="section-description">Adjust model, evaluation, and rainfall-analysis parameters.</p>
+
+        <div class="researcher-card">
+          <div class="card-heading">
+            <div>
+              <h3>Training parameters</h3>
+              <p>Changes apply to the next demo experiment</p>
+            </div>
+            <span class="status-badge">Configuration v0.4</span>
+          </div>
+
+          <form id="parameter-form" class="parameter-form">
+            <label for="learning-rate">Learning rate</label>
+            <input type="number" id="learning-rate" name="learningRate" value="0.00005" min="0" step="0.00001">
+
+            <label for="batch-size">Batch size</label>
+            <select id="batch-size" name="batchSize">
+              <option value="8">8</option>
+              <option value="16" selected>16</option>
+              <option value="32">32</option>
+              <option value="64">64</option>
+            </select>
+
+            <label for="epochs">Epochs</label>
+            <input type="number" id="epochs" name="epochs" value="3" min="1" max="100">
+
+            <label for="rainfall-window">Rainfall analysis window</label>
+            <select id="rainfall-window" name="rainfallWindow">
+              <option value="3">3-day cumulative</option>
+              <option value="7" selected>7-day cumulative</option>
+              <option value="30">30-day cumulative</option>
+            </select>
+
+            <label for="threshold-method">Threshold method</label>
+            <select id="threshold-method" name="thresholdMethod">
+              <option value="empirical">Empirical threshold</option>
+              <option value="statistical">Statistical threshold</option>
+              <option value="ml">Machine-learning threshold</option>
+            </select>
+
+            <button type="submit">Save parameters</button>
+          </form>
+          <p id="parameter-status" role="status"></p>
+        </div>
+
+        <div class="researcher-card">
+          <h3>Configuration safeguards</h3>
+          <ul class="settings-notes">
+            <li>Parameter changes are stored locally for this demonstration.</li>
+            <li>No live training job is started from this interface.</li>
+            <li>Dataset and model versions should be recorded before evaluation.</li>
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="/translations.js"></script>
+  <script src="/navbar.js"></script>
+  <script src="/research/research.js"></script>
+</body>
+</html>
