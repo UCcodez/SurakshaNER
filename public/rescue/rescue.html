@@ -4,14 +4,29 @@
   <title>Rescue Agency Portal — SurakshaNER</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/rescue/rescue.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&family=Source+Sans+3:wght@400;500;600;700&family=Archivo:wght@600;700&display=swap"
+  >
+
   <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#14201b">
+  <meta name="theme-color" content="#1e3a30">
 </head>
 <body class="page-home rescue-page">
   <script>window.NAV_BASE = '../'; window.NAV_CURRENT = 'rescue';</script>
   <div id="site-navbar"></div>
 
-  <h1 style="padding: 0 24px;">Rescue Agency Dashboard</h1>
+  <section class="rescue-hero">
+    <div class="rescue-hero-inner">
+      <div class="rescue-eyebrow">RESCUE &amp; AUTHORITY</div>
+      <!-- <h1>Rescue Agency Dashboard</h1> -->
+      <!-- <p>Live zone risk, SOS alerts, and field reports for coordinating response.</p> -->
+    </div>
+  </section>
 
   <div class="rescue-content-grid">
   <div class="rescue-main-col">
@@ -19,11 +34,11 @@
   <section class="rescue-map-section">
   <div class="map-search-header">
     <div>
-      <!-- <p class="map-eyebrow">LOCATION INTELLIGENCE</p> -->
+      <p class="map-eyebrow">LOCATION INTELLIGENCE</p>
       <h2>Search monitored locations</h2>
-      <p class="map-search-subtitle">
+      <!-- <p class="map-search-subtitle">
         Find and inspect currently monitored rescue zones.
-      </p>
+      </p> -->
     </div>
   </div>
 
@@ -37,9 +52,12 @@
     <button id="rescueLocationSearchBtn" type="button">
       Search
     </button>
+
+    <p id="rescueSearchMessage" class="rescue-search-message" aria-live="polite"></p>
+    
   </div>
 
-  <p id="rescueSearchMessage" class="rescue-search-message"></p>
+  <!-- <p id="rescueSearchMessage" class="rescue-search-message"></p> -->
 
   <div class="recent-search-heading">
     <h3>Recent searches</h3>
@@ -70,11 +88,11 @@
   <section class="ai-risk-dashboard">
     <div class="ai-dashboard-header">
       <div>
-        <p class="ai-eyebrow">AI RISK INTELLIGENCE</p>
-        <h2>Predictive Landslide Monitoring</h2>
-        <p class="ai-subtitle">
+        <p class="ai-eyebrow">Predictive Landslide Monitoring</p>
+        <h2>AI RISK INTELLIGENCE</h2>
+        <!-- <p class="ai-subtitle">
           Machine-learning insights for prioritising rescue operations.
-        </p>
+        </p> -->
       </div>
 
       <span id="aiModelStatus" class="ai-status">Demo mode</span>
@@ -125,7 +143,7 @@
       <div class="ai-panel">
         <h3>Contributing Factors</h3>
 
-                <div class="ai-factor">
+        <div class="ai-factor">
           <div>
             <span>Sensor Score</span>
             <strong id="aiSensorValue">--%</strong>
@@ -157,56 +175,103 @@
       </div>
     </div>
 
-        <div class="ai-panel" style="margin-top:16px;">
+    <div class="ai-demo-controls">
       <h3>Demo Controls</h3>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+      <div class="ai-demo-controls-row">
         <button class="post-btn" onclick="setDemoMode('sensor-focus')">Sensor Focus Mode</button>
         <button class="post-btn" onclick="setDemoMode('normal')">Normal Mode</button>
         <button class="post-btn" onclick="triggerRainfallSpike()">Trigger Rainfall Spike</button>
         <button class="post-btn" onclick="triggerSatelliteSpike()">Trigger Satellite Spike</button>
-        <button class="post-btn" onclick="resetDemo()" style="background:#e74c3c;">Reset Demo</button>
+        <button class="post-btn post-btn-danger" onclick="resetDemo()">Reset Demo</button>
       </div>
     </div>
   </section>
 
   </div>
 
-  <aside class="rescue-ops-sidebar">
-    <h2 class="rescue-ops-sidebar-title">Rescue Operations</h2>
-    <div class="tiles-stack">
-      <a href="/rescue/announcements.html" class="ops-tile">
-        <div class="ops-tile-label">Announcements</div>
-        <div class="ops-tile-sub">post &amp; view outbox</div>
-      </a>
-      <a href="/rescue/in-danger.html" class="ops-tile ops-tile-critical" id="tileInDangerCard">
-        <div class="ops-tile-label">In Danger</div>
-        <div class="ops-tile-count" id="tileDangerCount">--</div>
-        <div class="ops-tile-sub">active</div>
-      </a>
-      <a href="/rescue/sos.html" class="ops-tile ops-tile-critical" id="tileSOSCard">
-        <div class="ops-tile-label">SOS Alerts</div>
-        <div class="ops-tile-count" id="tileSOSCount">--</div>
-        <div class="ops-tile-sub">active</div>
-      </a>
-      <a href="/rescue/hazards.html" class="ops-tile">
-        <div class="ops-tile-label">Hazard Reports</div>
-        <div class="ops-tile-count" id="tileHazardCount">--</div>
-        <div class="ops-tile-sub">open</div>
-      </a>
-      <a href="/rescue/roads.html" class="ops-tile">
-        <div class="ops-tile-label">Road Connectivity</div>
-        <div class="ops-tile-count" id="tileRoadCount">--</div>
-        <div class="ops-tile-sub">at risk / blocked</div>
-      </a>
-      <a href="/rescue/trajectory.html" class="ops-tile">
-        <div class="ops-tile-label">Risk Trajectory</div>
-        <div class="ops-tile-sub">6hr projection</div>
-      </a>
-      <a href="#" class="ops-tile ops-tile-placeholder" onclick="return false;">
-        <div class="ops-tile-label">Shelter Info</div>
-        <div class="ops-tile-sub">coming soon</div>
-      </a>
+  <aside class="rescue-sidebar-col">
+
+
+    <div class="rescue-ops-sidebar">
+      <h2 class="rescue-ops-sidebar-title">Rescue Operations</h2>
+      <div class="tiles-stack">
+
+        <a href="/rescue/announcements.html" class="ops-tile">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">Recent Alerts</span>
+          </div>
+        </a>
+
+        <a href="/rescue/in-danger.html" class="ops-tile ops-tile-critical" id="tileInDangerCard">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">In Danger</span>
+            <span class="ops-tile-count" id="tileDangerCount">--</span>
+          </div>
+          <div class="ops-tile-sub">active</div>
+        </a>
+
+        <a href="/rescue/sos.html" class="ops-tile ops-tile-critical ops-tile-sos" id="tileSOSCard">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">SOS Alerts</span>
+            <span class="ops-tile-count" id="tileSOSCount">--</span>
+          </div>
+          <div class="ops-tile-sub">active</div>
+        </a>
+
+        <a href="/rescue/lost-found.html" class="ops-tile ops-tile-lostfound">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">Lost &amp; Found</span>
+          </div>
+          <div class="ops-tile-sub">people &amp; items</div>
+        </a>
+
+        <a href="/rescue/hazards.html" class="ops-tile">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">Hazard Reports</span>
+            <span class="ops-tile-count" id="tileHazardCount">--</span>
+          </div>
+          <div class="ops-tile-sub">open</div>
+        </a>
+
+        <a href="/rescue/roads.html" class="ops-tile">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">Road Connectivity</span>
+            <span class="ops-tile-count" id="tileRoadCount">--</span>
+          </div>
+          <div class="ops-tile-sub">at risk / blocked</div>
+        </a>
+
+        <a href="/rescue/trajectory.html" class="ops-tile">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">Risk Trajectory</span>
+          </div>
+          <div class="ops-tile-sub">6hr projection</div>
+        </a>
+
+        <a href="#" class="ops-tile ops-tile-placeholder" onclick="return false;">
+          <div class="ops-tile-row">
+            <span class="ops-tile-label">Shelter Info</span>
+          </div>
+          <div class="ops-tile-sub">coming soon</div>
+        </a>
+
+      </div>
     </div>
+
+    <section class="make-announcement-panel">
+      <h2>Make an Announcement</h2>
+      <p class="rescue-panel-subtitle">Post an update straight to the citizen portal.</p>
+
+      <div class="announcement-form">
+        <input type="text" id="annTitle" placeholder="Announcement title" />
+        <textarea id="annBody" rows="4" placeholder="Write the announcement..."></textarea>
+        <button class="post-btn post-btn-primary" onclick="postAnnouncement()">Post Announcement</button>
+        <p id="annStatus" class="rescue-search-message"></p>
+      </div>
+    </section>
+
+    
+
   </aside>
 
   </div>

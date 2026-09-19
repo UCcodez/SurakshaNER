@@ -1,0 +1,1454 @@
+/* =========================================================
+   SURAKSHANER
+   RESCUE & AUTHORITY PORTAL
+   VISUAL SYSTEM
+   =========================================================
+
+   Restyled to match the warm cream / pine-green palette used
+   across the rest of the site (see the Research & Inspection
+   page): light cream surfaces, dark pine-green for chrome and
+   the highest-stakes panel, ochre/red/blue for status accents.
+
+   Design direction:
+   - Light "field ops" surface — cream page background, white
+     cards, pine-green used for structure (header/hero button,
+     map panel header) and for the one dark accent block: the
+     Rescue Operations sidebar.
+   - Same type system as the rest of the site: Archivo (headings),
+     Source Sans 3 (body/UI), JetBrains Mono (data/eyebrows)
+   - Flat surfaces, hairline borders, no glow, no blur
+   - The Rescue Operations sidebar keeps its dark pine-green fill —
+     the one deliberate "highest-stakes panel" echo carried over
+     from the previous version
+   - Every ops tile renders at the same fixed height: label and
+     count share one row instead of the count getting its own
+     oversized line, so tiles with a live count (In Danger, SOS,
+     Hazard Reports, Road Connectivity) don't grow taller than
+     tiles without one (Recent Alerts, Risk Trajectory, Shelter
+     Info, Lost & Found)
+   - Fluid container width — no fixed-margin columns that leave
+     dead space on wide screens
+   ========================================================= */
+
+
+/* =========================================================
+   1. DESIGN TOKENS
+   ========================================================= */
+
+.rescue-page {
+
+  --rescue-bg: #ece4d3;
+  --rescue-surface: #c2aa79;
+  --rescue-surface-alt: #f3ecdc;
+  --rescue-surface-raised: #ffffff;
+  --make-announcement: #dfd79c;
+
+  /* Dark pine-green — header, hero button, map header, and the
+     Rescue Operations sidebar fill */
+  --rescue-pine: #1e3a30;
+  --rescue-pine-dark: #142a22;
+  --rescue-map: #6d9688;
+
+  --rescue-border: rgba(30, 58, 48, 0.16);
+  --rescue-border-soft: rgba(30, 58, 48, 0.10);
+
+  --rescue-ink: #1f2b24;
+  --rescue-muted: #5c6b60;
+  --rescue-muted-soft: #839083;
+
+  --rescue-red: #c0392b;
+  --rescue-red-dark: #9c2e22;
+  --rescue-maroon: #a8543f;
+  --rescue-ochre: #c69a58;
+  --rescue-ochre-light: #a97f3d;
+  --rescue-green: #4f7a5c;
+  --rescue-blue: #4a7f8c;
+
+  --rescue-radius: 10px;
+  --rescue-radius-small: 6px;
+
+  --rescue-container-max: 1520px;
+  --rescue-container-pad: clamp(20px, 4vw, 64px);
+
+  --font-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  min-height: 100vh;
+
+  background: var(--rescue-bg);
+  color: var(--rescue-ink);
+
+  font-family: var(--font-body);
+}
+
+
+.rescue-page *,
+.rescue-page *::before,
+.rescue-page *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   2. CONTAINER (shared width rule)
+   ========================================================= */
+
+.rescue-page .rescue-hero-inner,
+.rescue-page .rescue-content-grid {
+
+  width: min(
+    var(--rescue-container-max),
+    calc(100% - (var(--rescue-container-pad) * 2))
+  );
+
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   3. HERO
+   ========================================================= */
+
+.rescue-page .rescue-hero {
+
+  padding: 30px 0 8px;
+}
+
+
+.rescue-page .rescue-eyebrow {
+
+  margin: 0 0 10px;
+
+  color: var(--rescue-ochre-light);
+
+  font-family: var(--font-mono);
+  font-size: 19px;
+  font-weight: 600;
+
+  letter-spacing: 1.6px;
+  line-height: 1.3;
+
+  text-transform: uppercase;
+}
+
+
+.rescue-page .rescue-hero h1 {
+
+  margin: 0 0 8px;
+
+  color: var(--rescue-pine);
+
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 30px);
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.2px;
+}
+
+
+.rescue-page .rescue-hero p {
+
+  max-width: 560px;
+
+  margin: 0;
+
+  color: var(--rescue-muted);
+
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   4. CONTENT LAYOUT (80/20)
+   ========================================================= */
+
+.rescue-page .rescue-content-grid {
+
+  display: grid;
+
+  grid-template-columns: minmax(0, 7fr) minmax(280px, 3fr);
+
+  gap: 22px;
+  align-items: start;
+
+  padding: 20px 0 48px;
+}
+
+
+.rescue-page .rescue-main-col {
+
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+
+.rescue-page .rescue-sidebar-col {
+
+  position: sticky;
+
+  top: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 18px;
+}
+
+
+/* =========================================================
+   5. PANEL BASE (map section + AI dashboard share this)
+   ========================================================= */
+
+.rescue-page .rescue-panel {
+
+  padding: 22px 24px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius);
+
+  background: var(--rescue-surface);
+}
+
+
+.rescue-page .rescue-panel-eyebrow {
+
+  margin: 0 0 5px;
+
+  color: var(--rescue-muted-soft);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 1.4px;
+
+  text-transform: uppercase;
+}
+
+
+.rescue-page .rescue-panel h2 {
+
+  margin: 0;
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+
+  line-height: 1.25;
+}
+
+
+.rescue-page .rescue-panel-subtitle {
+
+  margin: 6px 0 0;
+
+  color: var(--rescue-muted);
+
+  font-size: 13.5px;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   6. MAP SEARCH SECTION
+   ========================================================= */
+
+.rescue-page .rescue-map-section {
+
+  padding: 22px 24px 24px;
+
+  border: 1px solid rgba(10, 22, 17, 0.5);
+
+  border-radius: var(--rescue-radius);
+
+  background: var(--rescue-map);
+}
+
+
+.rescue-page .map-search-header {
+
+  margin-bottom: 16px;
+}
+
+
+.rescue-page .map-eyebrow {
+
+  margin: 0 0 5px;
+
+  color: #2b1f1f;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 1.4px;
+
+  text-transform: uppercase;
+}
+
+
+.rescue-page .map-search-header h2 {
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 21px;
+  font-weight: 600;
+}
+
+
+.rescue-page .map-search-subtitle {
+
+  margin: 6px 0 0;
+
+  color: rgba(255, 255, 255, 0.68);
+
+  font-size: 13.5px;
+}
+
+
+.rescue-page .map-search-box {
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-bottom: 8px;
+}
+
+
+.rescue-page #rescueLocationSearch {
+
+  flex: 1;
+  min-width: 0;
+
+  min-height: 44px;
+
+  padding: 11px 14px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-raised);
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+
+.rescue-page #rescueLocationSearch::placeholder {
+
+  color: var(--rescue-muted-soft);
+}
+
+
+.rescue-page #rescueLocationSearch:focus {
+
+  outline: 3px solid rgba(74, 127, 140, 0.22);
+
+  outline-offset: 1px;
+
+  border-color: var(--rescue-blue);
+}
+
+
+.rescue-page #rescueLocationSearchBtn {
+
+  min-height: 44px;
+
+  padding: 0 20px;
+
+  border: 1px solid var(--rescue-surface-raised);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-raised);
+
+  color: var(--rescue-pine);
+
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: background-color 100ms ease, border-color 100ms ease;
+}
+
+
+.rescue-page #rescueLocationSearchBtn:hover {
+
+  background: var(--rescue-surface-alt);
+
+  border-color: var(--rescue-surface-alt);
+}
+
+.rescue-search-message {
+    min-height: 20px;
+    margin: 8px 0 0;
+    font-size: 0.9rem;
+    color: #4f5f58;
+}
+
+.rescue-search-message:empty {
+    display: none;
+}
+
+.rescue-page .rescue-map-section .rescue-search-message {
+
+  color: rgba(255, 255, 255, 0.70);
+}
+
+
+/* .rescue-page .rescue-search-message {
+
+  min-height: 20px;
+
+  margin: 6px 0 16px;
+
+  color: var(--rescue-ochre-light);
+
+  font-size: 12.5px;
+} */
+
+
+.rescue-page .recent-search-heading {
+
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 10px;
+}
+
+
+.rescue-page .recent-search-heading h3 {
+
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+
+.rescue-page .recent-search-heading span {
+
+  color: rgba(255, 255, 255, 0.55);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+
+.rescue-page .recent-location-tiles {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 10px;
+
+  margin-bottom: 16px;
+}
+
+
+.rescue-page .recent-location-tile {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 13px 14px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-alt);
+
+  color: var(--rescue-ink);
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition: border-color 120ms ease, transform 120ms ease;
+}
+
+
+.rescue-page .recent-location-tile:hover {
+
+  border-color: rgba(30, 58, 48, 0.55);
+
+  transform: translateY(-1px);
+}
+
+
+.rescue-page .recent-location-tile div {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.rescue-page .recent-location-tile strong {
+
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+
+.rescue-page .recent-location-tile span {
+
+  color: var(--rescue-muted-soft);
+
+  font-size: 11.5px;
+}
+
+
+.rescue-page .recent-location-tile small {
+
+  color: var(--rescue-muted);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.rescue-page #rescueMap {
+
+  min-height: 240px;
+
+  border-radius: var(--rescue-radius-small);
+
+  overflow: hidden;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+
+/* =========================================================
+   7. AI RISK INTELLIGENCE
+   ========================================================= */
+
+.rescue-page .ai-risk-dashboard {
+
+  padding: 24px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius);
+
+  background: var(--rescue-surface);
+}
+
+
+.rescue-page .ai-dashboard-header {
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 22px;
+}
+
+
+.rescue-page .ai-eyebrow {
+
+  margin: 0 0 5px;
+
+  color: var(--rescue-muted-soft);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 1.4px;
+
+  text-transform: uppercase;
+}
+
+
+.rescue-page .ai-dashboard-header h2 {
+
+  margin: 0;
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+
+.rescue-page .ai-subtitle {
+
+  margin: 8px 0 0;
+
+  color: var(--rescue-muted);
+
+  font-size: 13.5px;
+}
+
+
+.rescue-page .ai-status {
+
+  flex: 0 0 auto;
+
+  padding: 6px 12px;
+
+  border: 1px solid rgba(198, 154, 88, 0.55);
+
+  border-radius: 999px;
+
+  background: rgba(198, 154, 88, 0.14);
+
+  color: var(--rescue-ochre-light);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+
+.rescue-page .ai-summary-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 14px;
+}
+
+
+.rescue-page .ai-stat-card {
+
+  padding: 16px 18px;
+
+  border: 1px solid var(--rescue-border-soft);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-alt);
+}
+
+
+.rescue-page .ai-stat-label {
+
+  display: block;
+
+  margin-bottom: 9px;
+
+  color: var(--rescue-muted-soft);
+
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+
+  letter-spacing: 0.4px;
+
+  text-transform: uppercase;
+}
+
+
+.rescue-page .ai-stat-card strong {
+
+  display: block;
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+
+  line-height: 1.1;
+}
+
+
+.rescue-page .ai-stat-card strong span {
+
+  color: var(--rescue-muted-soft);
+
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+.rescue-page .ai-stat-card small {
+
+  display: block;
+
+  margin-top: 8px;
+
+  color: var(--rescue-muted);
+
+  font-size: 12px;
+}
+
+
+.rescue-page .ai-detail-grid {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 14px;
+
+  margin-top: 14px;
+}
+
+
+.rescue-page .ai-panel {
+
+  padding: 18px 20px;
+
+  border: 1px solid var(--rescue-border-soft);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-alt);
+}
+
+
+.rescue-page .ai-panel h3 {
+
+  margin: 0 0 12px;
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+
+.rescue-page .ai-panel p {
+
+  margin: 0;
+
+  color: var(--rescue-muted);
+
+  font-size: 13.5px;
+
+  line-height: 1.6;
+}
+
+
+.rescue-page .ai-recommendation {
+
+  margin-top: 16px;
+
+  padding: 13px 14px;
+
+  border-left: 3px solid var(--rescue-ochre);
+
+  border-radius: 5px;
+
+  background: rgba(198, 154, 88, 0.12);
+}
+
+
+.rescue-page .ai-recommendation strong {
+
+  color: var(--rescue-ochre-light);
+
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+
+.rescue-page .ai-recommendation p {
+
+  margin: 6px 0 0;
+
+  color: var(--rescue-ink);
+}
+
+
+.rescue-page .ai-factor {
+
+  margin: 15px 0;
+}
+
+
+.rescue-page .ai-factor:first-child {
+
+  margin-top: 0;
+}
+
+
+.rescue-page .ai-factor > div:first-child {
+
+  display: flex;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 7px;
+
+  color: var(--rescue-muted);
+
+  font-size: 12.5px;
+}
+
+
+.rescue-page .ai-factor strong {
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+
+.rescue-page .ai-progress {
+
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: var(--rescue-border);
+}
+
+
+.ai-progress span {
+    display: block;
+    height: 100%;
+    width: var(--progress);
+    background: #4f7a5c; /* green by default */
+    transition: width 150ms ease, background-color 150ms ease;
+}
+
+.ai-progress span.factor-warning {
+    background: #c69a58;
+}
+
+.ai-progress span.factor-danger {
+    background: #c0392b;
+}
+
+
+/* =========================================================
+   8. DEMO CONTROLS
+   ========================================================= */
+
+.rescue-page .ai-demo-controls {
+
+  margin-top: 16px;
+
+  padding: 18px 20px;
+
+  border: 1px solid var(--rescue-border-soft);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-alt);
+}
+
+
+.rescue-page .ai-demo-controls h3 {
+
+  margin: 0;
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+
+.rescue-page .ai-demo-controls-row {
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 10px;
+
+  margin-top: 12px;
+}
+
+
+/* =========================================================
+   9. BUTTONS (post-btn shared across rescue pages)
+   ========================================================= */
+
+.rescue-page .post-btn {
+
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 9px 15px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-raised);
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background-color 100ms ease, border-color 100ms ease;
+}
+
+
+.rescue-page .post-btn:hover {
+
+  background: var(--rescue-surface-alt);
+
+  border-color: rgba(30, 58, 48, 0.32);
+}
+
+
+.rescue-page .post-btn-danger {
+
+  border-color: var(--rescue-red);
+
+  background: var(--rescue-red);
+
+  color: #ffffff;
+}
+
+
+.rescue-page .post-btn-danger:hover {
+
+  background: var(--rescue-red-dark);
+
+  border-color: var(--rescue-red-dark);
+}
+
+
+/* Filled pine-green primary action — used for "Post Announcement" */
+.rescue-page .post-btn-primary {
+
+  border-color: var(--rescue-pine);
+
+  background: var(--rescue-pine);
+
+  color: #ffffff;
+}
+
+
+.rescue-page .post-btn-primary:hover {
+
+  background: var(--rescue-pine-dark);
+
+  border-color: var(--rescue-pine-dark);
+}
+
+
+/* =========================================================
+   10. MAKE AN ANNOUNCEMENT PANEL
+   ========================================================= */
+
+.rescue-page .make-announcement-panel {
+
+  padding: 20px 22px 22px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius);
+
+  background: var(--make-announcement);
+}
+
+
+.rescue-page .announcement-form {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  margin-top: 14px;
+}
+
+
+.rescue-page .announcement-form input,
+.rescue-page .announcement-form textarea {
+
+  width: 100%;
+
+  padding: 11px 13px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-raised);
+
+  color: var(--rescue-ink);
+
+  font-family: var(--font-body);
+  font-size: 13.5px;
+
+  resize: vertical;
+}
+
+
+.rescue-page .announcement-form input::placeholder,
+.rescue-page .announcement-form textarea::placeholder {
+
+  color: var(--rescue-muted-soft);
+}
+
+
+.rescue-page .announcement-form input:focus,
+.rescue-page .announcement-form textarea:focus {
+
+  outline: 3px solid rgba(30, 58, 48, 0.16);
+
+  outline-offset: 1px;
+
+  border-color: var(--rescue-pine);
+}
+
+
+.rescue-page .announcement-form .post-btn {
+
+  align-self: flex-start;
+}
+
+
+/* =========================================================
+   11. OPS SIDEBAR (kept dark pine-green — the one deliberate
+   high-stakes accent block on this otherwise light page)
+   ========================================================= */
+
+.rescue-page .rescue-ops-sidebar {
+
+  padding: 18px;
+
+  border: 1px solid rgba(10, 22, 17, 0.5);
+
+  border-radius: var(--rescue-radius);
+
+  background: var(--rescue-pine);
+}
+
+
+.rescue-page .rescue-ops-sidebar-title {
+
+  margin: 0 0 14px;
+
+  color: #ffffff;
+
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+
+.rescue-page .tiles-stack {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+
+/*
+   Every tile is the same fixed height regardless of content.
+   Achieved by keeping tiles to at most two rows: a top row
+   (label, plus an inline count when the tile has one) and an
+   optional caption row underneath — never a separate oversized
+   line just for the number.
+*/
+
+.rescue-page .ops-tile {
+
+  height: 60px;
+
+  padding: 0 16px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 3px;
+
+  border: 1px solid rgba(255, 255, 255, 0.14);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: rgba(10, 20, 15, 0.35);
+
+  color: #ffffff;
+
+  text-decoration: none;
+
+  transition: border-color 120ms ease, transform 120ms ease, background-color 120ms ease;
+}
+
+
+.rescue-page .ops-tile:hover {
+
+  border-color: rgba(255, 255, 255, 0.32);
+
+  transform: translateY(-1px);
+}
+
+
+.rescue-page .ops-tile-row {
+
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+
+.rescue-page .ops-tile-label {
+
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+
+  line-height: 1.2;
+}
+
+
+/* Inline now, not a separate oversized line — this is the fix
+   that makes tiles with a count the same height as tiles
+   without one. */
+.rescue-page .ops-tile-count {
+
+  flex: 0 0 auto;
+
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  color: #b7d3c2;
+}
+
+
+.rescue-page .ops-tile-sub {
+
+  color: rgba(238, 243, 238, 0.55);
+
+  font-size: 11px;
+
+  line-height: 1.2;
+}
+
+
+/* In Danger: neutral by default, only switches to red once
+   there's something actually active — toggled by
+   refreshTileCounts() in rescue.js based on live counts. */
+.rescue-page .ops-tile-critical.ops-tile-active {
+
+  border-color: var(--rescue-red);
+
+  background: rgba(159, 40, 35, 0.28);
+}
+
+
+.rescue-page .ops-tile-critical.ops-tile-active .ops-tile-count {
+
+  color: #ff9a8f;
+}
+
+
+.rescue-page .ops-tile-critical.ops-tile-active:hover {
+
+  border-color: #ff9a8f;
+}
+
+
+/* SOS Alerts: always styled to stand out from every other tile,
+   regardless of whether there's a live count — this is the tile
+   a responder should never have to hunt for. Gets an even hotter
+   fill on top once there are active alerts. */
+.rescue-page .ops-tile-sos {
+
+  border-color: var(--rescue-red);
+
+  background: rgba(214, 68, 56, 0.30);
+}
+
+
+.rescue-page .ops-tile-sos .ops-tile-count {
+
+  color: #ff9a8f;
+}
+
+
+.rescue-page .ops-tile-sos:hover {
+
+  border-color: #ff9a8f;
+}
+
+
+.rescue-page .ops-tile-sos.ops-tile-active {
+
+  background: rgba(224, 58, 45, 0.55);
+
+  border-color: #ff9a8f;
+}
+
+
+/* Lost & Found: also flagged red-family, but a distinct terracotta
+   so it's never confused with SOS or an active In Danger alert. */
+.rescue-page .ops-tile-lostfound {
+
+  border-color: var(--rescue-maroon);
+
+  background: rgba(168, 84, 63, 0.30);
+}
+
+
+.rescue-page .ops-tile-lostfound:hover {
+
+  border-color: #d98a6f;
+}
+
+
+.rescue-page .ops-tile-placeholder {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+.rescue-page .ops-tile-placeholder:hover {
+
+  transform: none;
+
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+
+/* =========================================================
+   12. SHARED LIST-ITEM BASE (sos-item / road-item)
+   ========================================================= */
+
+.rescue-page .sos-item,
+.rescue-page .road-item {
+
+  padding: 12px 14px;
+
+  margin-bottom: 10px;
+
+  border: 1px solid var(--rescue-border-soft);
+
+  border-left: 3px solid var(--rescue-red);
+
+  border-radius: var(--rescue-radius-small);
+
+  background: var(--rescue-surface-alt);
+
+  color: var(--rescue-ink);
+
+  font-size: 13.5px;
+
+  line-height: 1.5;
+}
+
+
+.rescue-page .road-item {
+
+  border-left-color: var(--rescue-blue);
+}
+
+
+.rescue-page .sos-meta {
+
+  margin-top: 5px;
+
+  color: var(--rescue-muted-soft);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+
+.rescue-page .sos-item select,
+.rescue-page .road-item select {
+
+  margin-top: 8px;
+
+  padding: 6px 8px;
+
+  border: 1px solid var(--rescue-border);
+
+  border-radius: 5px;
+
+  background: var(--rescue-surface-raised);
+
+  color: var(--rescue-ink);
+
+  font-size: 12.5px;
+}
+
+
+/* =========================================================
+   13. HIGH-RISK MAP MARKER PULSE
+   ========================================================= */
+
+/*
+   Kept from the previous implementation — a live map that pulses
+   its highest-risk marker is a functional life-safety affordance,
+   not decoration. Tied to the literal stroke color rescue.js sets
+   (#e74c3c); if that hex changes, update the selector here too.
+*/
+
+@keyframes pulse-glow {
+  0% { filter: drop-shadow(0 0 3px #e74c3c); }
+  50% { filter: drop-shadow(0 0 10px #e74c3c); }
+  100% { filter: drop-shadow(0 0 3px #e74c3c); }
+}
+
+.rescue-page .leaflet-interactive[stroke="#e74c3c"] {
+  animation: pulse-glow 1.6s ease-in-out infinite;
+}
+
+
+/* =========================================================
+   14. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1080px) {
+
+  .rescue-page .ai-summary-grid {
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+
+  .rescue-page .ai-detail-grid {
+
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 900px) {
+
+  .rescue-page .rescue-content-grid {
+
+    grid-template-columns: 1fr;
+  }
+
+
+  .rescue-page .rescue-sidebar-col {
+
+    position: static;
+  }
+
+
+  .rescue-page .tiles-stack {
+
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+
+  .rescue-page .ops-tile {
+
+    flex: 1 1 200px;
+
+    width: auto;
+  }
+}
+
+
+@media (max-width: 650px) {
+
+  .rescue-page .map-search-box {
+
+    flex-direction: column;
+  }
+
+
+  .rescue-page #rescueLocationSearchBtn {
+
+    min-height: 44px;
+  }
+
+
+  .rescue-page .recent-location-tiles {
+
+    grid-template-columns: 1fr;
+  }
+
+
+  .rescue-page #rescueMap {
+
+    min-height: 360px;
+  }
+
+
+  .rescue-page .ai-dashboard-header {
+
+    flex-direction: column;
+  }
+
+
+  .rescue-page .ai-summary-grid {
+
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+
+  .rescue-page *,
+  .rescue-page *::before,
+  .rescue-page *::after {
+
+    transition: none !important;
+
+    animation: none !important;
+  }
+}

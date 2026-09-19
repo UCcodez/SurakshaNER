@@ -88,28 +88,35 @@ function findZoneForLocation(locationKey) {
 }
 
 function focusRescueLocation(locationKey) {
-  const location = monitoredLocations[locationKey];
+    console.log('focusRescueLocation:', locationKey);
 
-  if (!location || typeof map === 'undefined') {
-    console.warn('Map or location not available:', locationKey);
-    return;
-  }
+    const location = monitoredLocations[locationKey];
 
-  map.flyTo(
-    [location.lat, location.lng],
-    location.zoom,
-    { duration: 1.2 }
-  );
+    if (!location) {
+        console.error('No monitored location found:', locationKey);
+        return;
+    }
 
-  const matchingZone = findZoneForLocation(locationKey);
+    if (!map) {
+        console.error('Leaflet map is not available');
+        return;
+    }
 
-  if (matchingZone && zoneMarkers[matchingZone.id]) {
-    setTimeout(() => {
-      zoneMarkers[matchingZone.id].openPopup();
-    }, 1200);
-  }
+    map.flyTo(
+        [location.lat, location.lng],
+        location.zoom,
+        {
+            animate: true,
+            duration: 1.2,
+            easeLinearity: 0.25
+        }
+    );
 
-  updateRecentLocationOrder(locationKey);
+    console.log(
+        `Flying to ${location.name}:`,
+        location.lat,
+        location.lng
+    );
 }
 
 // function updateRecentLocationOrder(selectedKey) {
@@ -184,27 +191,80 @@ document
     focusRescueLocation(locationKey);
   });
 
+  document.getElementById('rescueLocationSearchBtn')?.addEventListener('click', () => {
+    console.log('SEARCH BUTTON CLICKED');
+    searchRescueLocation();
+});
+
+// function searchRescueLocation() {
+//   console.log('Search Function Fired');
+//   const input = document.getElementById('rescueLocationSearch');
+//   const message = document.getElementById('rescueSearchMessage');
+
+//   if (!input || !message) return;
+
+//   const result = findMonitoredLocation(input.value);
+
+//   if (!result) {
+//     message.textContent =
+//       'Enter Guwahati or Shillong to search.';
+//     return;
+//   }
+
+//   const [locationKey, location] = result;
+
+//   message.textContent =
+//     `Showing monitored location: ${location.name}`;
+
+//   focusRescueLocation(locationKey);
+// }
+
 function searchRescueLocation() {
-  const input = document.getElementById('rescueLocationSearch');
-  const message = document.getElementById('rescueSearchMessage');
+    console.log('Search Function Fired');
 
-  if (!input || !message) return;
+    const input = document.getElementById('rescueLocationSearch');
+    const message = document.getElementById('rescueSearchMessage');
 
-  const result = findMonitoredLocation(input.value);
+    if (!input) return;
 
-  if (!result) {
-    message.textContent =
-      'Enter Guwahati or Shillong to search.';
-    return;
-  }
+    const query = input.value.trim();
 
-  const [locationKey, location] = result;
+    if (!query) {
+        if (message) {
+            message.textContent = 'Enter a location to search.';
+        }
+        return;
+    }
 
-  message.textContent =
-    `Showing monitored location: ${location.name}`;
+    const result = findMonitoredLocation(query);
 
-  focusRescueLocation(locationKey);
+    console.log('SEARCH QUERY:', query);
+    console.log('SEARCH RESULT:', result);
+
+    // Not currently monitored
+    if (!result) {
+        if (message) {
+            message.textContent =
+                'Location not currently monitored. Currently, only Guwahati and Shillong are being monitored.';
+        }
+
+        return;
+    }
+
+    // Monitored location found
+    const [locationKey, location] = result;
+
+    if (message) {
+        message.textContent =
+            `Showing monitored location: ${location.name}`;
+    }
+
+    console.log('FOCUSING:', locationKey);
+
+    focusRescueLocation(locationKey);
 }
+
+
 
 document
   .getElementById('rescueLocationSearchBtn')
@@ -214,6 +274,7 @@ document
   .getElementById('rescueLocationSearch')
   ?.addEventListener('keydown', event => {
     if (event.key === 'Enter') {
+      event.preventDefault();
       searchRescueLocation();
     }
   });
