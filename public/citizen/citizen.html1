@@ -58,9 +58,7 @@
           Report an emergency or send an SOS
         </h1>
 
-        <p>
-          Your location is sent automatically when you click the SOS button.
-        </p>
+      
 
         <div class="hero-ctas">
 
@@ -77,6 +75,15 @@
 
               SOS
             </button>
+
+            <div>
+              <p>
+              Your location is sent automatically
+              <br>
+              when you click the SOS button.
+            </p>
+            </div>
+            
 
           </div>
 
@@ -105,6 +112,8 @@
             </a>
 
           </div>
+
+          
 
         </div>
 
@@ -313,259 +322,9 @@
 
 
     <!-- =========================
-         LOST & FOUND
-         + HAZARD REPORT
+         HAZARD REPORT
     ========================== -->
-    <div class="citizen-grid">
-
-      <section
-        class="panel citizen-panel lostfound-panel"
-        id="lostFoundSection"
-      >
-
-        <div class="panel-heading">
-
-          <div class="panel-heading-text">
-
-            <span class="panel-icon" aria-hidden="true">
-              <!-- icon: people-search -->
-            </span>
-
-            <div>
-              <div class="panel-eyebrow">
-                COMMUNITY SUPPORT
-              </div>
-
-              <h2>
-                Lost &amp; Found
-              </h2>
-            </div>
-
-          </div>
-
-          <div class="panel-heading-note">
-            Report, search, reunite.
-          </div>
-
-        </div>
-
-
-        <!-- REPORT -->
-        <div class="lostfound-report">
-
-          <h3>Report a person or item</h3>
-
-          <div class="form-group">
-
-            <label for="lfType">
-              What are you reporting?
-            </label>
-
-            <select id="lfType">
-              <option value="person">Missing person</option>
-              <option value="item">Lost item</option>
-            </select>
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="lfName">
-              Name or brief description
-            </label>
-
-            <input
-              type="text"
-              id="lfName"
-              placeholder="e.g. Elderly man, grey jacket"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="lfDescription">
-              Additional details
-
-              <span class="field-optional">
-                Optional
-              </span>
-            </label>
-
-            <textarea
-              id="lfDescription"
-              rows="3"
-              placeholder="Last seen location, distinguishing features..."
-            ></textarea>
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="lfContact">
-              Contact number
-
-              <span class="field-optional">
-                Optional
-              </span>
-            </label>
-
-            <input
-              type="text"
-              id="lfContact"
-              placeholder="Phone number to reach you"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label for="lfMedia">
-              Photo
-
-              <span class="field-optional">
-                Optional
-              </span>
-            </label>
-
-            <div class="file-field">
-
-              <label for="lfMedia" class="file-field-trigger">
-                <span class="ui-icon" aria-hidden="true">
-                  <!-- icon: upload -->
-                </span>
-                <span>Choose photo</span>
-              </label>
-
-              <input
-                type="file"
-                id="lfMedia"
-                accept="image/*"
-                capture="environment"
-              >
-
-              <span class="file-field-hint">JPG, PNG (Max 15MB)</span>
-
-            </div>
-
-          </div>
-
-
-          <button
-            type="button"
-            class="post-btn"
-            id="lfSubmitBtn"
-            onclick="submitLostFound()"
-          >
-            <span class="ui-icon" aria-hidden="true">
-              <!-- icon: send / paper-plane -->
-            </span>
-            Submit Report
-          </button>
-
-          <div
-            id="lfStatus"
-            class="citizen-status hazard-status"
-            aria-live="polite"
-          ></div>
-
-        </div>
-
-
-        <div class="lostfound-divider"></div>
-
-
-        <!-- BROWSE -->
-        <div class="lostfound-browse">
-
-          <h3>Registry</h3>
-
-          <div class="lostfound-search-row">
-
-            <input
-              type="search"
-              id="lfSearch"
-              placeholder="Search by name..."
-              autocomplete="off"
-            >
-
-            <button
-              type="button"
-              id="lfSearchBtn"
-              class="lf-search-btn"
-              aria-label="Search"
-            >
-              <span class="ui-icon" aria-hidden="true">
-                <!-- icon: search -->
-              </span>
-              Search
-            </button>
-
-          </div>
-
-
-          <div class="lostfound-filters" id="lfFilters">
-
-            <button type="button" class="lf-filter active" data-filter="all">
-              All
-            </button>
-
-            <button type="button" class="lf-filter" data-filter="active">
-              Active
-            </button>
-
-            <button type="button" class="lf-filter" data-filter="found">
-              Resolved
-            </button>
-
-          </div>
-
-
-          <div id="lostFoundList">
-            Loading...
-          </div>
-
-          <div
-            class="announcements-pagination"
-            id="lfPagination"
-            hidden
-          >
-
-            <button
-              type="button"
-              class="pagination-btn"
-              id="lfPrev"
-              aria-label="Previous entries"
-            >
-              &lsaquo;
-            </button>
-
-            <span
-              class="pagination-status"
-              id="lfPageStatus"
-            >
-              1 / 1
-            </span>
-
-            <button
-              type="button"
-              class="pagination-btn"
-              id="lfNext"
-              aria-label="Next entries"
-            >
-              &rsaquo;
-            </button>
-
-          </div>
-
-        </div>
-
-      </section>
-
+    <div class="citizen-grid citizen-grid-single">
 
       <section
         class="panel citizen-panel hazard-panel"
@@ -980,7 +739,6 @@
   <script src="/socket.io/socket.io.js"></script>
   <script src="/citizen/citizen.js"></script>
   <script src="/citizen/citizen-announcements-pagination.js"></script>
-  <script src="/citizen/citizen-lostfound.js"></script>
 
 
   <!-- =========================

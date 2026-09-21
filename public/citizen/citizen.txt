@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Citizen Portal — SurakshaNER</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#14201b">
+</head>
+<body class="page-home">
+  <script>window.NAV_BASE = '../'; window.NAV_CURRENT = 'citizen';</script>
+  <div id="site-navbar"></div>
+  <div id="citizen-alert-banner"></div>
+
+  <section class="hero">
+    <div class="hero-eyebrow">CITIZEN ALERT PORTAL</div>
+    <h1>Report an emergency or send an SOS</h1>
+    <p>Your location is sent automatically with every alert.</p>
+    <div class="hero-ctas">
+      <button class="cta-primary open-emergency-modal">Emergency Services</button>
+      <button id="in-danger-btn" class="in-danger-btn">IN DANGER</button>
+    </div>
+  </section>
+
+  <div class="citizen-grid">
+    <div class="panel">
+      <h2>Send SOS</h2>
+      <div class="form-group">
+        <label>Number of people needing help</label>
+        <input type="number" id="victimCount" value="1" min="1"
+          style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;">
+      </div>
+      <div class="form-group" style="margin-top:14px;">
+        <label>Anyone elderly, disabled, or needing medical attention?</label>
+        <select id="vulnerability"
+          style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;">
+          <option value="none">No</option>
+          <option value="elderly">Elderly person</option>
+          <option value="disabled">Person with disability</option>
+          <option value="medical">Medical emergency</option>
+          <option value="child">Young child</option>
+        </select>
+      </div>
+      <button class="sos-btn" id="sosBtn" onclick="sendSOS()">SEND SOS ALERT</button>
+      <div id="status" style="color:#9fb3a8; text-align:center; margin-top:10px;"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Announcements</h2>
+      <div id="announcements">Loading...</div>
+    </div>
+  </div>
+
+  
+  <div class="citizen-grid">
+  <div class="panel" id="reportHazardSection">
+    <h2>REPORT A HAZARD</h2>
+    <div class="form-group">
+      <label>What are you seeing?</label>
+      <div id="hazardButtons" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
+        <button type="button" class="hazard-btn" data-hazard="crack">Crack</button>
+        <button type="button" class="hazard-btn" data-hazard="debris">Debris</button>
+        <button type="button" class="hazard-btn" data-hazard="roadblock">Road Blocked</button>
+        <button type="button" class="hazard-btn" data-hazard="other">Other</button>
+      </div>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <input type="file" id="mediaFile" accept="image/*,video/*" capture="environment"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;">
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <textarea id="reportDescription" placeholder="Optional details..." rows="3"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;box-sizing:border-box;"></textarea>
+    </div>
+    <button class="post-btn" id="reportBtn" onclick="submitReport()" style="margin-top:12px;">Submit Hazard Report</button>
+    <div id="reportStatus" style="color:#9fb3a8; margin-top:8px;"></div>
+  </div>
+
+  <!-- <div class="panel" id="lostFoundSection">
+    <h2>LOST &amp; FOUND</h2>
+    <div class="form-group">
+      <label>Reporting a</label>
+      <select id="lfType" style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;">
+        <option value="person">Missing person</option>
+        <option value="item">Lost item</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <label>Name / description</label>
+      <input type="text" id="lfName" placeholder="e.g. Ravi Ghosh, age 45" style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;box-sizing:border-box;">
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <textarea id="lfDescription" placeholder="Additional details, last seen wearing, etc." rows="3"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;box-sizing:border-box;"></textarea>
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <input type="text" id="lfContact" placeholder="Your contact number"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;margin-top:6px;box-sizing:border-box;">
+    </div>
+    <div class="form-group" style="margin-top:14px;">
+      <input type="file" id="lfMedia" accept="image/*"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;">
+    </div>
+    <button class="post-btn" onclick="submitLostFound()" style="margin-top:12px;">Submit Lost &amp; Found Report</button>
+    <div id="lfStatus" style="color:#9fb3a8; margin-top:8px;"></div>
+
+    <div style="margin-top:20px;">
+      <input type="text" id="lfSearch" placeholder="Search by name..." oninput="renderLostFoundList()"
+        style="width:100%;padding:10px;border-radius:8px;border:0.5px solid #3a5245;background:#1c2b24;color:#eef3ee;box-sizing:border-box;">
+      <div id="lostFoundList" style="margin-top:14px;">Loading...</div>
+    </div>
+  </div> -->
+</div>
+
+  <!-- DOST assistance notification panel -->
+  <aside id="dost-panel" class="dost-panel" aria-label="DOST assistance panel">
+    <div class="dost-header">
+      <div>
+        <div class="dost-kicker">SurakshaNER</div>
+        <h2>DOST</h2>
+        <!-- <p>Assistance</p> -->
+      </div>
+      <button id="dost-close" class="dost-close" type="button" aria-label="Close DOST">&times;</button>
+    </div>
+
+    <div class="dost-body">
+      <div class="dost-welcome">Hello! I’m DOST. How can I help you right now?</div>
+      <h3>Suggested questions</h3>
+      <div class="dost-suggestions">
+        <button type="button" data-dost-question="What should I do during a landslide?">What should I do during a landslide?</button>
+        <button type="button" data-dost-question="Where is the nearest shelter?">Where is the nearest shelter?</button>
+        <button type="button" data-dost-question="How do I report a hazard?">How do I report a hazard?</button>
+      </div>
+
+      <h3>Quick actions</h3>
+      <div class="dost-actions dost-actions-row">
+        <button type="button" class="dost-action" id="dost-help">☎ <span>Call for Help</span></button>
+        <button type="button" class="dost-action dost-action-sos" id="dost-sos">⚠ <span>Send SOS</span></button>
+        <button type="button" class="dost-action" id="dost-ask">?<span>Ask a Question</span></button>
+      </div>
+
+      <div id="dost-messages" class="dost-messages" aria-live="polite"></div>
+    </div>
+    <form id="dost-form" class="dost-input-row">
+      <input id="dost-input" type="text" placeholder="Type your question..." aria-label="Ask DOST a question">
+      <button type="submit" aria-label="Send question">➤</button>
+    </form>
+  </aside>
+  <button id="dost-open" class="dost-open" type="button" aria-label="Open DOST assistance">DOST</button>
+
+  <script src="/translations.js"></script>
+  <script src="/offline-queue.js"></script>
+  <script src="/navbar.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/citizen/citizen.js"></script>
+  <script>
+    (function () {
+      const panel = document.getElementById('dost-panel');
+      const close = document.getElementById('dost-close');
+      const open = document.getElementById('dost-open');
+      const form = document.getElementById('dost-form');
+      const input = document.getElementById('dost-input');
+      const messages = document.getElementById('dost-messages');
+
+      function addMessage(text, who) {
+        const item = document.createElement('div');
+        item.className = 'dost-message ' + (who || 'bot');
+        item.textContent = text;
+        messages.appendChild(item);
+        messages.scrollTop = messages.scrollHeight;
+      }
+      function ask(question) {
+        if (!question) return;
+        addMessage(question, 'user');
+        const answer = question.toLowerCase().includes('landslide')
+          ? 'Move away from slopes and unstable ground, follow official alerts, and avoid crossing debris.'
+          : question.toLowerCase().includes('shelter')
+          ? 'Demo response: nearby shelters will appear here once location services and the rescue database are connected.'
+          : question.toLowerCase().includes('hazard')
+          ? 'Use the Report a Hazard section on this page to submit details and media.'
+          : 'This is a demo response from DOST. A live assistance service will provide verified guidance here.';
+        setTimeout(() => addMessage(answer, 'bot'), 250);
+      }
+      close.addEventListener('click', () => { panel.classList.add('is-closed'); open.classList.add('is-visible'); });
+      open.addEventListener('click', () => { panel.classList.remove('is-closed'); open.classList.remove('is-visible'); });
+      document.querySelectorAll('[data-dost-question]').forEach(btn => btn.addEventListener('click', () => ask(btn.dataset.dostQuestion)));
+      form.addEventListener('submit', e => { e.preventDefault(); const value = input.value.trim(); input.value = ''; ask(value); });
+      document.getElementById('dost-help').addEventListener('click', () => addMessage('Demo action: connecting you to emergency assistance.', 'bot'));
+      document.getElementById('dost-sos').addEventListener('click', () => { addMessage('Demo action: SOS prepared. Use the main SEND SOS ALERT button to submit the real alert.', 'bot'); document.getElementById('sosBtn')?.focus(); });
+      document.getElementById('dost-ask').addEventListener('click', () => input.focus());
+    })();
+  </script>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js').then(() => {
+        console.log('Service worker registered');
+        if (navigator.onLine) flushSOSQueue();
+      });
+    }
+  </script>
+</body>
+</html>

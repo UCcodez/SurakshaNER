@@ -1,0 +1,3163 @@
+/* =========================================================
+   SURAKSHANER
+   CITIZEN PORTAL
+   REFINED VISUAL SYSTEM — v2
+   =========================================================
+
+   This stylesheet controls Citizen-specific presentation.
+
+   Shared application styles remain in /style.css.
+   This file loads after /style.css and intentionally
+   overrides Citizen-page defaults where required.
+
+   Design direction:
+   - Warm paper foundation
+   - Muted earth / forest palette
+   - Distinct but related panel surfaces
+   - Semantic emergency red
+   - Restrained information ochre / blue
+   - Flat surfaces, strong hairline borders, minimal shadow
+   - No gradients, no glow, no glassmorphism
+   - Fluid container width — content should use the viewport,
+     not float in a fixed 1100px column with dead margins
+   - Type system with clear roles, not one font everywhere:
+       Space Grotesk  → headings
+       Source Sans 3  → body / UI / controls
+       JetBrains Mono → eyebrows, timestamps, data labels
+   ========================================================= */
+
+
+/* =========================================================
+   1. DESIGN TOKENS
+   ========================================================= */
+
+.page-home {
+
+  --citizen-paper: #e8e6da;
+  --citizen-paper-light: #f2f0e7;
+  --citizen-ink: #18221c;
+  --citizen-muted: #59665d;
+
+  --citizen-forest: #20372c;
+  --citizen-forest-dark: #16281f;
+  --citizen-forest-mid: #304936;
+
+  /* Distinct from forest-dark on purpose — the nav bar, CTA
+     buttons, and DOST launcher already use forest-dark, so
+     Alert Authorities gets its own pine-green identity rather
+     than blending into "the dark green that's everywhere." */
+  --citizen-pine: #1e3a30;
+  --citizen-pine-dark: #142a22;
+
+  --citizen-olive: #68754a;
+  --citizen-olive-dark: #4c5a38;
+  --citizen-olive-light: #8a9364;
+
+  --citizen-ochre: #c69a58;
+  --citizen-ochre-light: #ddc58f;
+
+  --citizen-warm: #d3c79c;
+  --citizen-warm-light: #e8e3d1;
+
+  --citizen-red: #c9362f;
+  --citizen-red-dark: #9f2823;
+  --citizen-red-light: #f0d1cd;
+
+  --citizen-blue: #486b76;
+  --citizen-blue-light: #d7e1e2;
+
+  /* Shelter panel — a muted teal-sage, kept in the same earth/
+     forest family as the rest of the palette but distinct from
+     pine (Alert Authorities), olive (Announcements) and blue
+     (Lost & Found), so "Find Shelter" reads as its own category
+     rather than a repeat of an existing panel. */
+  --citizen-sage: #3d5c53;
+  --citizen-sage-dark: #2a4139;
+  --citizen-sage-light: #9dbcae;
+
+  --citizen-white: #f7f6ef;
+
+  --citizen-border: rgba(24, 34, 28, 0.20);
+  --citizen-border-light: rgba(255, 255, 255, 0.18);
+
+  --citizen-radius: 7px;
+  --citizen-radius-small: 5px;
+
+  /* Fluid content container — replaces the old fixed
+     min(1100px, ...) cap that left large dead gutters
+     on wide screens. Content now scales with viewport
+     up to a generous ceiling. */
+  --citizen-container-max: 1440px;
+  --citizen-container-pad: clamp(20px, 4vw, 64px);
+
+  --font-display: "Archivo", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Source Sans 3", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+
+  min-height: 100vh;
+  margin: 0;
+
+  background: var(--citizen-paper);
+  color: var(--citizen-ink);
+
+  font-family: var(--font-body);
+}
+
+
+/* =========================================================
+   2. ACCESSIBILITY
+   ========================================================= */
+
+.page-home .sr-only {
+  position: absolute;
+
+  width: 1px;
+  height: 1px;
+
+  padding: 0;
+  margin: -1px;
+
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+
+  white-space: nowrap;
+
+  border: 0;
+}
+
+
+/* =========================================================
+   3. GLOBAL BOX MODEL
+   ========================================================= */
+
+.page-home *,
+.page-home *::before,
+.page-home *::after {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   4. CONTAINER (shared width rule)
+   ========================================================= */
+
+.page-home .citizen-hero,
+.page-home .citizen-grid,
+.page-home .citizen-grid-single,
+.page-home .citizen-columns {
+
+  width: min(
+    var(--citizen-container-max),
+    calc(100% - (var(--citizen-container-pad) * 2))
+  );
+
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   5. HERO
+   ========================================================= */
+
+.page-home .citizen-hero {
+
+  padding: 36px 0 32px;
+}
+
+
+.page-home .hero-inner {
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 32px;
+}
+
+
+.page-home .hero-main {
+
+  min-width: 0;
+  max-width: 640px;
+}
+
+
+/* Eyebrow */
+
+.page-home .hero-eyebrow {
+
+  margin: 0 0 12px;
+
+  color: var(--citizen-olive-dark);
+
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+
+  letter-spacing: 1.6px;
+  line-height: 1.3;
+
+  text-transform: uppercase;
+}
+
+
+/* Headline */
+
+.page-home .hero-title {
+
+  margin: 0 0 10px;
+
+  color: var(--citizen-ink);
+
+  font-family: var(--font-display);
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 700;
+
+  line-height: 1.15;
+
+  letter-spacing: -0.3px;
+}
+
+
+/* Supporting copy */
+
+.page-home .citizen-hero p {
+
+  max-width: 560px;
+
+  margin: 0;
+
+  color: var(--citizen-muted);
+
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+
+/* =========================================================
+   6. HERO DECORATION (regional identity block)
+   ========================================================= */
+
+.page-home .hero-decor {
+
+  flex: 0 0 auto;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  padding-top: 4px;
+}
+
+
+.page-home .hero-decor-caption {
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  gap: 2px;
+
+  color: rgba(24, 34, 28, 0.42);
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+
+  letter-spacing: 1.4px;
+
+  text-transform: uppercase;
+  text-align: right;
+}
+
+
+.page-home .hero-decor-rule {
+
+  width: 46px;
+  height: 1px;
+
+  margin: 10px 0 14px;
+
+  background: rgba(24, 34, 28, 0.28);
+}
+
+
+.page-home .hero-decor-art {
+
+  width: min(260px, 22vw);
+  height: 80px;
+
+  /* Placeholder slot — drop in the mountain-range motif
+     (SVG or PNG, transparent background) here. */
+}
+
+
+/* =========================================================
+   7. HERO ACTIONS
+   ========================================================= */
+
+.page-home .hero-ctas {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex-wrap: wrap;
+
+  gap: 16px;
+
+  margin-top: 22px;
+}
+
+
+.page-home .hero-ctas-group {
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+}
+
+
+/* Shared button geometry */
+
+.page-home .cta-primary,
+.page-home .in-danger-btn {
+
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 10px 18px;
+
+  border-radius: var(--citizen-radius-small);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease,
+    transform 80ms ease;
+}
+
+
+/* Emergency Services */
+
+.page-home .cta-primary {
+
+  background: var(--citizen-forest);
+
+  border: 1px solid var(--citizen-forest);
+
+  color: var(--citizen-white);
+}
+
+
+.page-home .cta-primary:hover {
+
+  background: var(--citizen-forest-dark);
+
+  border-color: var(--citizen-forest-dark);
+}
+
+
+.page-home .cta-primary:active {
+
+  transform: translateY(1px);
+}
+
+
+/* SOS */
+
+.page-home .in-danger-btn {
+
+  background: var(--citizen-red);
+
+  border: 1px solid var(--citizen-red);
+
+  color: #ffffff;
+}
+
+
+.page-home .in-danger-btn:hover {
+
+  background: var(--citizen-red-dark);
+
+  border-color: var(--citizen-red-dark);
+}
+
+
+.page-home .in-danger-btn:active {
+
+  transform: translateY(1px);
+}
+
+
+/* Lost & Found — ochre, not red, so it reads as "worth noticing"
+   without borrowing SOS's urgency. */
+
+.page-home .cta-lostfound {
+
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 10px 18px;
+
+  border-radius: var(--citizen-radius-small);
+
+  background: var(--citizen-ochre);
+
+  border: 1px solid var(--citizen-ochre);
+
+  color: var(--citizen-ink);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+
+  line-height: 1;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease,
+    transform 80ms ease;
+}
+
+
+.page-home .cta-lostfound:hover {
+
+  background: #b3854a;
+
+  border-color: #b3854a;
+}
+
+
+.page-home .cta-lostfound:active {
+
+  transform: translateY(1px);
+}
+
+
+/* =========================================================
+   8. ICON PLACEHOLDER SYSTEM
+   ========================================================= */
+
+/*
+   Empty by design — drop an <svg> or <img> inside each
+   .ui-icon / .panel-icon span. Sizing is reserved so layout
+   does not shift once icons are added.
+*/
+
+.page-home .ui-icon {
+
+  width: 17px;
+  height: 17px;
+
+  flex: 0 0 17px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.page-home .ui-icon svg,
+.page-home .ui-icon img {
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  color: currentColor;
+}
+
+
+.page-home .hazard-btn .ui-icon {
+
+  width: 18px;
+  height: 18px;
+
+  flex-basis: 18px;
+}
+
+
+/* Panel heading icon chip */
+
+.page-home .panel-icon {
+
+  width: 34px;
+  height: 34px;
+
+  flex: 0 0 34px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 6px;
+
+  background: rgba(255, 255, 255, 0.14);
+}
+
+
+.page-home .hazard-panel .panel-icon {
+
+  background: rgba(24, 34, 28, 0.10);
+}
+
+
+/* =========================================================
+   9. MAIN CONTENT
+   ========================================================= */
+
+.page-home .citizen-content {
+
+  width: 100%;
+}
+
+
+.page-home .citizen-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 18px;
+
+  padding: 0 0 18px;
+}
+
+
+.page-home .citizen-grid-single {
+
+  padding-bottom: 36px;
+}
+
+
+/* ---------------------------------------------------------
+   Two-column layout — each column stacks a different number
+   of panels (left: 2, right: 3), so this is a pair of flex
+   columns inside a grid rather than a fixed-row grid. Columns
+   are independent, so one running longer than the other never
+   stretches or misaligns its neighbour.
+   --------------------------------------------------------- */
+
+.page-home .citizen-columns {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+
+  gap: 18px;
+
+  padding: 0 0 18px;
+}
+
+
+.page-home .citizen-column {
+
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+
+  gap: 18px;
+}
+
+
+/* =========================================================
+   10. BASE PANEL
+   ========================================================= */
+
+.page-home .citizen-panel {
+
+  min-width: 0;
+
+  padding: 22px 24px;
+
+  border-radius: var(--citizen-radius);
+
+  border: 1px solid var(--citizen-border);
+
+  color: var(--citizen-white);
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   11. PANEL COLOUR LANGUAGE
+   ========================================================= */
+
+/*
+   The panels intentionally do NOT share one colour.
+   They belong to the same muted earth/forest family,
+   but colour differentiates information categories:
+
+   - Alert Authorities  → darkest forest  (highest stakes)
+   - Announcements       → olive           (ambient information)
+   - Hazard report       → warm tan        (citizen input, light surface)
+   - Find Shelter         → sage / teal     (safe-haven information)
+*/
+
+.page-home .citizen-sos-panel {
+
+  background: var(--citizen-pine);
+
+  border-color: rgba(8, 22, 17, 0.45);
+}
+
+
+.page-home .citizen-announcements-panel {
+
+  background: var(--citizen-olive-dark);
+
+  border-color: rgba(24, 34, 28, 0.30);
+}
+
+
+.page-home .hazard-panel {
+
+  background: var(--citizen-warm);
+
+  border-color: rgba(24, 34, 28, 0.20);
+
+  color: var(--citizen-ink);
+}
+
+
+/* ---------------------------------------------------------
+   Lost & Found — blue, matching the "info" semantic used for
+   announcements. This is a community-support feature, not an
+   emergency one, so it deliberately isn't red or forest green.
+   --------------------------------------------------------- */
+
+.page-home .lostfound-panel {
+
+  background: var(--citizen-blue);
+
+  border-color: rgba(24, 44, 48, 0.35);
+}
+
+
+/* ---------------------------------------------------------
+   Find Shelter — sage/teal, its own "safe haven" identity,
+   distinct from every other panel colour on the page.
+   --------------------------------------------------------- */
+
+.page-home .shelter-panel {
+
+  background: var(--citizen-sage);
+
+  border-color: rgba(20, 34, 30, 0.40);
+}
+
+
+/* =========================================================
+   12. PANEL HEADINGS
+   ========================================================= */
+
+.page-home .panel-heading {
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  margin-bottom: 20px;
+
+  padding-bottom: 16px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.20);
+}
+
+
+.page-home .hazard-panel .panel-heading {
+
+  border-bottom-color: rgba(24, 34, 28, 0.18);
+}
+
+
+.page-home .panel-heading-text {
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+}
+
+
+.page-home .panel-heading-note {
+
+  flex: 0 0 auto;
+
+  padding-top: 4px;
+
+  color: rgba(247, 246, 239, 0.60);
+
+  font-size: 12px;
+  line-height: 1.4;
+
+  text-align: right;
+}
+
+
+.page-home .hazard-panel .panel-heading-note {
+
+  color: rgba(24, 34, 28, 0.55);
+}
+
+
+/* Eyebrow */
+
+.page-home .panel-eyebrow {
+
+  margin-bottom: 5px;
+
+  color: rgba(247, 246, 239, 0.64);
+
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+
+  letter-spacing: 1.3px;
+  line-height: 1.3;
+
+  text-transform: uppercase;
+}
+
+
+.page-home .hazard-panel .panel-eyebrow {
+
+  color: rgba(24, 34, 28, 0.62);
+}
+
+
+/* Headings */
+
+.page-home .citizen-panel h2 {
+
+  margin: 0;
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+
+  line-height: 1.2;
+
+  letter-spacing: -0.2px;
+}
+
+
+.page-home .hazard-panel h2 {
+
+  color: var(--citizen-ink);
+}
+
+
+/* =========================================================
+   13. FORM STRUCTURE
+   ========================================================= */
+
+.page-home .form-group {
+
+  margin-bottom: 16px;
+}
+
+
+.page-home .form-group:last-child {
+
+  margin-bottom: 0;
+}
+
+
+.page-home .form-group label {
+
+  display: block;
+
+  margin-bottom: 7px;
+
+  color: rgba(247, 246, 239, 0.88);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.4;
+}
+
+
+.page-home .hazard-panel .form-group label {
+
+  color: var(--citizen-ink);
+}
+
+
+.page-home .field-optional {
+
+  margin-left: 6px;
+
+  padding: 1px 7px;
+
+  border-radius: 999px;
+
+  background: rgba(24, 34, 28, 0.08);
+
+  color: rgba(24, 34, 28, 0.55);
+
+  font-size: 10.5px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.4px;
+}
+
+
+/* Hazard fields sit side by side on wide screens */
+
+.page-home .hazard-fields-row {
+
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr);
+
+  gap: 16px;
+}
+
+
+/* =========================================================
+   14. FORM CONTROLS
+   ========================================================= */
+
+.page-home input,
+.page-home select,
+.page-home textarea {
+
+  width: 100%;
+
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+
+.page-home .citizen-panel input[type="number"],
+.page-home .citizen-panel input[type="search"],
+.page-home .citizen-panel select,
+.page-home .citizen-panel textarea {
+
+  width: 100%;
+
+  min-height: 42px;
+
+  padding: 10px 12px;
+
+  border: 1px solid rgba(24, 34, 28, 0.30);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: var(--citizen-paper-light);
+
+  color: var(--citizen-ink);
+
+  font-size: 14px;
+
+  box-shadow: none;
+}
+
+
+.page-home .citizen-panel input[type="number"] {
+
+  appearance: textfield;
+}
+
+
+.page-home .citizen-panel textarea {
+
+  min-height: 104px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+
+.page-home .citizen-panel input::placeholder,
+.page-home .citizen-panel textarea::placeholder {
+
+  color: #69736b;
+}
+
+
+/* ---------------------------------------------------------
+   File field (styled wrapper around input[type=file])
+   --------------------------------------------------------- */
+
+.page-home .file-field {
+
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  min-height: 44px;
+
+  padding: 0 12px;
+
+  border: 1px dashed rgba(24, 34, 28, 0.32);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: var(--citizen-paper-light);
+}
+
+
+.page-home .file-field-trigger {
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 9px;
+
+  color: var(--citizen-ink);
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.page-home .file-field input[type="file"] {
+
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: 0;
+
+  cursor: pointer;
+}
+
+
+.page-home .file-field-hint {
+
+  margin-left: auto;
+
+  padding-left: 10px;
+
+  color: rgba(24, 34, 28, 0.48);
+
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+
+  white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------
+   Controls inside Alert Authorities
+   --------------------------------------------------------- */
+
+.page-home .citizen-sos-panel input[type="number"],
+.page-home .citizen-sos-panel select {
+
+  background: #f3f1e7;
+
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+
+/* ---------------------------------------------------------
+   Controls inside Find Shelter
+   --------------------------------------------------------- */
+
+.page-home .shelter-panel input[type="search"] {
+
+  background: rgba(255, 255, 255, 0.08);
+
+  border-color: rgba(255, 255, 255, 0.22);
+
+  color: var(--citizen-white);
+}
+
+
+.page-home .shelter-panel input[type="search"]::placeholder {
+
+  color: rgba(247, 246, 239, 0.55);
+}
+
+
+/* ---------------------------------------------------------
+   Focus
+   --------------------------------------------------------- */
+
+.page-home .citizen-panel input:focus,
+.page-home .citizen-panel select:focus,
+.page-home .citizen-panel textarea:focus,
+.page-home .file-field:has(input:focus) {
+
+  outline: 3px solid rgba(72, 107, 118, 0.25);
+
+  outline-offset: 1px;
+
+  border-color: var(--citizen-blue);
+}
+
+
+/* =========================================================
+   15. SOS BUTTON
+   ========================================================= */
+
+.page-home .sos-btn {
+
+  width: 100%;
+
+  min-height: 54px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 9px;
+
+  margin-top: 22px;
+
+  padding: 14px 20px;
+
+  border: 1px solid var(--citizen-red-dark);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: var(--citizen-red);
+
+  color: #ffffff;
+
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+
+  letter-spacing: 0.3px;
+
+  cursor: pointer;
+
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease,
+    transform 80ms ease;
+}
+
+
+.page-home .sos-btn:hover {
+
+  background: var(--citizen-red-dark);
+
+  border-color: #85221e;
+}
+
+
+.page-home .sos-btn:active {
+
+  transform: translateY(1px);
+}
+
+
+.page-home .sos-btn:disabled {
+
+  background: #7b7b73;
+
+  border-color: #6d6d66;
+
+  color: #e8e8e2;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   16. STATUS MESSAGES / FOOTNOTES
+   ========================================================= */
+
+.page-home .citizen-status {
+
+  min-height: 18px;
+
+  margin-top: 10px;
+
+  color: rgba(247, 246, 239, 0.75);
+
+  font-size: 13px;
+
+  line-height: 1.4;
+}
+
+
+.page-home #status {
+
+  text-align: center;
+}
+
+
+.page-home .panel-footnote {
+
+  display: flex;
+  align-items: center;
+
+  gap: 7px;
+
+  margin: 12px 0 0;
+
+  color: rgba(247, 246, 239, 0.56);
+
+  font-size: 12px;
+
+  line-height: 1.4;
+}
+
+
+.page-home .hazard-status {
+
+  color: rgba(24, 34, 28, 0.70);
+}
+
+
+.page-home #reportStatus {
+
+  margin-top: 0;
+}
+
+
+/* =========================================================
+   17. ANNOUNCEMENTS
+   ========================================================= */
+
+.page-home #announcements {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+}
+
+
+.page-home #announcements .announcement {
+
+  position: relative;
+
+  padding: 14px 34px 14px 16px;
+
+  background: #f2f1e9;
+
+  border: 1px solid rgba(24, 34, 28, 0.16);
+
+  border-left: 3px solid var(--citizen-ochre);
+
+  border-radius: 5px;
+
+  color: var(--citizen-ink);
+
+  line-height: 1.45;
+}
+
+
+/* Title row: badge + zone name + timestamp */
+
+.page-home #announcements .announcement .announcement-top {
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-bottom: 5px;
+}
+
+
+.page-home #announcements .announcement-badge {
+
+  padding: 2px 8px;
+
+  border-radius: 4px;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 0.4px;
+
+  text-transform: uppercase;
+
+  background: rgba(24, 34, 28, 0.08);
+
+  color: var(--citizen-ink);
+}
+
+
+.page-home #announcements .announcement strong {
+
+  color: var(--citizen-ink);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+.page-home #announcements .announcement .time {
+
+  margin-left: auto;
+
+  color: #68716a;
+
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+
+  white-space: nowrap;
+}
+
+
+/* Trailing chevron */
+
+.page-home #announcements .announcement::after {
+
+  content: "";
+
+  position: absolute;
+
+  top: 50%;
+  right: 14px;
+
+  width: 7px;
+  height: 7px;
+
+  border-right: 1.6px solid rgba(24, 34, 28, 0.35);
+  border-bottom: 1.6px solid rgba(24, 34, 28, 0.35);
+
+  transform: translateY(-50%) rotate(-45deg);
+}
+
+
+/* =========================================================
+   17b. ANNOUNCEMENTS PAGINATION
+   ========================================================= */
+
+.page-home .announcements-pagination {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 14px;
+
+  margin-top: 14px;
+
+  padding-top: 14px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+
+.page-home .announcements-pagination[hidden] {
+
+  display: none;
+}
+
+
+.page-home .pagination-btn {
+
+  width: 30px;
+  height: 30px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  color: var(--citizen-white);
+
+  font-size: 15px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: background-color 100ms ease, border-color 100ms ease;
+}
+
+
+.page-home .pagination-btn:hover:not(:disabled) {
+
+  background: rgba(255, 255, 255, 0.13);
+
+  border-color: rgba(255, 255, 255, 0.34);
+}
+
+
+.page-home .pagination-btn:disabled {
+
+  opacity: 0.35;
+
+  cursor: not-allowed;
+}
+
+
+.page-home .pagination-status {
+
+  min-width: 44px;
+
+  color: rgba(247, 246, 239, 0.70);
+
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   18. ANNOUNCEMENT LEVEL VARIANTS
+   ========================================================= */
+
+.page-home #announcements .announcement.high-risk {
+
+  border-left-color: var(--citizen-red);
+}
+
+.page-home #announcements .announcement.high-risk .announcement-badge {
+
+  background: var(--citizen-red-light);
+  color: var(--citizen-red-dark);
+}
+
+
+.page-home #announcements .announcement.warning {
+
+  border-left-color: var(--citizen-ochre);
+}
+
+.page-home #announcements .announcement.warning .announcement-badge {
+
+  background: #f1e3c8;
+  color: #7a5a24;
+}
+
+
+.page-home #announcements .announcement.info {
+
+  border-left-color: var(--citizen-blue);
+}
+
+.page-home #announcements .announcement.info .announcement-badge {
+
+  background: var(--citizen-blue-light);
+  color: var(--citizen-blue);
+}
+
+
+.page-home #announcements .announcement.safe {
+
+  border-left-color: #5d7c4c;
+}
+
+.page-home #announcements .announcement.safe .announcement-badge {
+
+  background: #e1e8d8;
+  color: #46602f;
+}
+
+
+/* =========================================================
+   19. HAZARD BUTTONS
+   ========================================================= */
+
+.page-home .hazard-buttons {
+
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 9px;
+
+  margin-top: 2px;
+}
+
+
+.page-home .hazard-btn {
+
+  min-height: 44px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 9px 15px;
+
+  border: 1px solid rgba(24, 34, 28, 0.22);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: rgba(255, 255, 255, 0.5);
+
+  color: var(--citizen-ink);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 1.2;
+
+  cursor: pointer;
+
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease,
+    color 100ms ease;
+}
+
+
+.page-home .hazard-btn:hover {
+
+  background: rgba(255, 255, 255, 0.78);
+
+  border-color: rgba(24, 34, 28, 0.38);
+}
+
+
+.page-home .hazard-btn.selected {
+
+  background: var(--citizen-forest);
+
+  border-color: var(--citizen-forest);
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   20. HAZARD SUBMIT
+   ========================================================= */
+
+.page-home .hazard-submit-row {
+
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  gap: 14px;
+
+  margin-top: 18px;
+}
+
+
+.page-home .post-btn {
+
+  min-height: 46px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 11px 18px;
+
+  border: 1px solid var(--citizen-forest);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: var(--citizen-forest);
+
+  color: #ffffff;
+
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 100ms ease,
+    border-color 100ms ease;
+}
+
+
+.page-home .post-btn:hover {
+
+  background: var(--citizen-forest-dark);
+
+  border-color: var(--citizen-forest-dark);
+}
+
+
+.page-home .hazard-submit-note {
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  color: rgba(24, 34, 28, 0.58);
+
+  font-size: 12.5px;
+
+  line-height: 1.4;
+}
+
+
+/* =========================================================
+   20b. LOST & FOUND
+   ========================================================= */
+
+.page-home .lostfound-report,
+.page-home .lostfound-browse {
+
+  display: block;
+}
+
+
+.page-home .lostfound-report h3,
+.page-home .lostfound-browse h3 {
+
+  margin: 0 0 14px;
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-display);
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+
+.page-home .lostfound-divider {
+
+  height: 1px;
+
+  margin: 20px 0;
+
+  background: rgba(255, 255, 255, 0.14);
+}
+
+
+/* Search row */
+
+.page-home .lostfound-search-row {
+
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 12px;
+}
+
+
+.page-home #lfSearch {
+
+  flex: 1;
+  min-width: 0;
+
+  min-height: 40px;
+
+  padding: 8px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+
+.page-home #lfSearch::placeholder {
+
+  color: rgba(247, 246, 239, 0.55);
+}
+
+
+.page-home #lfSearch:focus {
+
+  outline: 2px solid rgba(255, 255, 255, 0.25);
+
+  outline-offset: 1px;
+
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+
+.page-home .lf-search-btn {
+
+  flex: 0 0 auto;
+
+  min-height: 40px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  padding: 8px 14px;
+
+  border: 1px solid rgba(255, 255, 255, 0.28);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: rgba(255, 255, 255, 0.10);
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition: background-color 100ms ease, border-color 100ms ease;
+}
+
+
+.page-home .lf-search-btn:hover {
+
+  background: rgba(255, 255, 255, 0.18);
+
+  border-color: rgba(255, 255, 255, 0.45);
+}
+
+
+/* Filter chips */
+
+.page-home .lostfound-filters {
+
+  display: flex;
+
+  gap: 7px;
+
+  margin-bottom: 14px;
+}
+
+
+.page-home .lf-filter {
+
+  padding: 6px 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.20);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: transparent;
+
+  color: rgba(247, 246, 239, 0.72);
+
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: background-color 100ms ease, border-color 100ms ease, color 100ms ease;
+}
+
+
+.page-home .lf-filter:hover {
+
+  border-color: rgba(255, 255, 255, 0.4);
+
+  color: var(--citizen-white);
+}
+
+
+.page-home .lf-filter.active {
+
+  background: rgba(255, 255, 255, 0.16);
+
+  border-color: rgba(255, 255, 255, 0.4);
+
+  color: var(--citizen-white);
+}
+
+
+/* Entry list */
+
+.page-home #lostFoundList {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  max-height: 480px;
+
+  overflow-y: auto;
+}
+
+
+.page-home .lf-empty {
+
+  margin: 0;
+
+  padding: 14px 16px;
+
+  color: rgba(247, 246, 239, 0.65);
+
+  font-size: 13px;
+}
+
+
+/* ---------------------------------------------------------
+   Entry card
+   --------------------------------------------------------- */
+
+.page-home .lf-entry {
+
+  padding: 14px;
+
+  background: #f2f1e9;
+
+  border: 1px solid rgba(24, 34, 28, 0.14);
+
+  border-radius: 7px;
+
+  color: var(--citizen-ink);
+}
+
+
+.page-home .lf-entry.is-found {
+
+  border-color: rgba(70, 96, 47, 0.28);
+}
+
+
+.page-home .lf-entry-top {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  margin-bottom: 10px;
+}
+
+
+.page-home .lf-badge {
+
+  padding: 3px 9px;
+
+  border-radius: 4px;
+
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+
+  letter-spacing: 0.4px;
+
+  text-transform: uppercase;
+
+  background: var(--citizen-red-light);
+
+  color: var(--citizen-red-dark);
+}
+
+
+.page-home .lf-badge.is-resolved {
+
+  background: #e1e8d8;
+
+  color: #46602f;
+}
+
+
+.page-home .lf-id {
+
+  color: #8a938c;
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+
+.page-home .lf-entry-main {
+
+  display: flex;
+
+  gap: 12px;
+}
+
+
+.page-home .lf-avatar {
+
+  flex: 0 0 46px;
+
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 8px;
+
+  background: var(--citizen-red-light);
+
+  color: var(--citizen-red-dark);
+
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+
+.page-home .lf-entry.is-found .lf-avatar {
+
+  background: #e1e8d8;
+
+  color: #46602f;
+}
+
+
+.page-home .lf-avatar-img {
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+}
+
+
+.page-home .lf-entry-body {
+
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+.page-home .lf-name {
+
+  display: block;
+
+  color: var(--citizen-ink);
+
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+
+.page-home .lf-callout {
+
+  margin-top: 7px;
+
+  padding: 8px 10px;
+
+  border-left: 2px solid #8a938c;
+
+  border-radius: 3px;
+
+  background: rgba(24, 34, 28, 0.04);
+
+  color: #4b564f;
+
+  font-size: 12px;
+
+  line-height: 1.45;
+}
+
+
+.page-home .lf-footer {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: 9px;
+
+  color: #5c665f;
+
+  font-size: 11.5px;
+}
+
+
+.page-home .lf-footer .lf-time {
+
+  font-family: var(--font-mono);
+
+  color: #8a938c;
+}
+
+
+.page-home .lf-call {
+
+  color: var(--citizen-forest);
+
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+
+.page-home .lf-call:hover {
+
+  text-decoration: underline;
+}
+
+
+/* =========================================================
+   20c. FIND SHELTER
+   ========================================================= */
+
+.page-home .shelter-list {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  max-height: 420px;
+
+  overflow-y: auto;
+}
+
+
+.page-home .shelter-empty {
+
+  margin: 0;
+
+  padding: 14px 16px;
+
+  color: rgba(247, 246, 239, 0.65);
+
+  font-size: 13px;
+}
+
+
+.page-home .shelter-footnote {
+
+  color: rgba(247, 246, 239, 0.56);
+}
+
+
+/* Entry card — same light "readout" surface as lf-entry /
+   announcement cards, so the whole page shares one card
+   language even though each panel behind it is a different
+   colour. */
+
+.page-home .shelter-entry {
+
+  padding: 14px;
+
+  background: #f2f1e9;
+
+  border: 1px solid rgba(24, 34, 28, 0.14);
+
+  border-radius: 7px;
+
+  color: var(--citizen-ink);
+}
+
+
+.page-home .shelter-entry-top {
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-bottom: 10px;
+}
+
+
+.page-home .shelter-name {
+
+  display: block;
+
+  color: var(--citizen-ink);
+
+  font-family: var(--font-display);
+  font-size: 14.5px;
+  font-weight: 700;
+
+  line-height: 1.3;
+}
+
+
+.page-home .shelter-location {
+
+  display: flex;
+  align-items: center;
+
+  gap: 4px;
+
+  margin-top: 3px;
+
+  color: #5c665f;
+
+  font-size: 12px;
+}
+
+
+.page-home .shelter-location .ui-icon {
+
+  width: 12px;
+  height: 12px;
+
+  flex-basis: 12px;
+}
+
+
+.page-home .shelter-occupancy-badge {
+
+  flex: 0 0 auto;
+
+  padding: 4px 9px;
+
+  border-radius: 5px;
+
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  background: #e1e8d8;
+  color: #46602f;
+}
+
+
+.page-home .shelter-occupancy-badge.caution {
+
+  background: #f1e3c8;
+  color: #7a5a24;
+}
+
+
+.page-home .shelter-occupancy-badge.full {
+
+  background: var(--citizen-red-light);
+  color: var(--citizen-red-dark);
+}
+
+
+/* Occupancy bar */
+
+.page-home .shelter-progress {
+
+  height: 6px;
+
+  margin-bottom: 12px;
+
+  border-radius: 999px;
+
+  background: rgba(24, 34, 28, 0.10);
+
+  overflow: hidden;
+}
+
+
+.page-home .shelter-progress-fill {
+
+  height: 100%;
+
+  border-radius: 999px;
+
+  background: #5d7c4c;
+
+  transition: width 200ms ease;
+}
+
+
+.page-home .shelter-occupancy-badge.caution ~ .shelter-progress .shelter-progress-fill,
+.page-home .shelter-entry.is-caution .shelter-progress-fill {
+
+  background: var(--citizen-ochre);
+}
+
+
+.page-home .shelter-entry.is-full .shelter-progress-fill {
+
+  background: var(--citizen-red);
+}
+
+
+/* Info grid: Water / Doctor / Rations / Incharge */
+
+.page-home .shelter-info-grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 8px 14px;
+}
+
+
+.page-home .shelter-info-item {
+
+  min-width: 0;
+
+  font-size: 12.5px;
+  line-height: 1.4;
+}
+
+
+.page-home .shelter-info-label {
+
+  display: block;
+
+  color: #7c867e;
+
+  font-size: 11px;
+}
+
+
+.page-home .shelter-info-value {
+
+  display: block;
+
+  color: var(--citizen-ink);
+
+  font-weight: 600;
+}
+
+
+/* Footer: call + certification */
+
+.page-home .shelter-footer {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+
+  margin-top: 12px;
+
+  padding-top: 10px;
+
+  border-top: 1px solid rgba(24, 34, 28, 0.10);
+}
+
+
+.page-home .shelter-call {
+
+  display: inline-flex;
+  align-items: center;
+
+  gap: 6px;
+
+  color: var(--citizen-forest);
+
+  font-size: 12.5px;
+  font-weight: 700;
+
+  text-decoration: none;
+}
+
+
+.page-home .shelter-call:hover {
+
+  text-decoration: underline;
+}
+
+
+.page-home .shelter-certified {
+
+  color: #7c867e;
+
+  font-size: 11px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   21. DOST ASSISTANCE PANEL
+   ========================================================= */
+
+.page-home .dost-panel {
+
+  position: fixed;
+
+  top: 88px;
+  right: 24px;
+
+  width: min(360px, calc(100vw - 48px));
+
+  max-height: calc(100vh - 112px);
+
+  display: flex;
+  flex-direction: column;
+
+  z-index: 1500;
+
+  overflow: hidden;
+
+  background: var(--citizen-forest-dark);
+
+  border: 1px solid rgba(255, 255, 255, 0.18);
+
+  border-radius: 7px;
+
+  box-shadow: 0 10px 28px rgba(19, 31, 24, 0.20);
+}
+
+
+.page-home .dost-panel.is-closed {
+
+  display: none;
+}
+
+
+/* =========================================================
+   22. DOST HEADER
+   ========================================================= */
+
+.page-home .dost-header {
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  padding: 15px 16px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+
+.page-home .dost-kicker {
+
+  margin-bottom: 4px;
+
+  color: var(--citizen-ochre-light);
+
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+
+  letter-spacing: 1.3px;
+}
+
+
+.page-home .dost-header h2 {
+
+  margin: 0;
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+
+  line-height: 1.2;
+}
+
+
+.page-home .dost-close {
+
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: rgba(247, 246, 239, 0.72);
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+
+.page-home .dost-close:hover {
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   23. DOST BODY
+   ========================================================= */
+
+.page-home .dost-body {
+
+  min-height: 0;
+
+  padding: 15px;
+
+  overflow-y: auto;
+}
+
+
+.page-home .dost-welcome {
+
+  padding: 11px 12px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border-left: 3px solid var(--citizen-ochre);
+
+  border-radius: 4px;
+
+  color: rgba(247, 246, 239, 0.82);
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.page-home .dost-section {
+
+  margin-top: 18px;
+}
+
+
+.page-home .dost-body h3 {
+
+  margin: 0 0 8px;
+
+  color: rgba(247, 246, 239, 0.86);
+
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+
+  letter-spacing: 0.4px;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   24. DOST SUGGESTIONS
+   ========================================================= */
+
+.page-home .dost-suggestions {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+}
+
+
+.page-home .dost-suggestions button {
+
+  width: 100%;
+
+  padding: 9px 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: rgba(247, 246, 239, 0.88);
+
+  font-family: var(--font-body);
+  font-size: 12.5px;
+
+  line-height: 1.4;
+
+  text-align: left;
+
+  cursor: pointer;
+}
+
+
+.page-home .dost-suggestions button:hover {
+
+  background: rgba(255, 255, 255, 0.09);
+
+  border-color: rgba(255, 255, 255, 0.22);
+}
+
+
+/* =========================================================
+   25. DOST QUICK ACTIONS
+   ========================================================= */
+
+.page-home .dost-actions {
+
+  display: grid;
+
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 7px;
+}
+
+
+.page-home .dost-action {
+
+  width: 100%;
+
+  min-height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px;
+
+  border: 1px solid rgba(255, 255, 255, 0.15);
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.07);
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+
+  line-height: 1.2;
+
+  text-align: center;
+
+  cursor: pointer;
+}
+
+
+.page-home .dost-action:hover {
+
+  background: rgba(255, 255, 255, 0.12);
+
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+
+.page-home .dost-action-sos {
+
+  background: var(--citizen-red);
+
+  border-color: var(--citizen-red);
+}
+
+
+.page-home .dost-action-sos:hover {
+
+  background: var(--citizen-red-dark);
+
+  border-color: var(--citizen-red-dark);
+}
+
+
+/* =========================================================
+   26. DOST MESSAGES
+   ========================================================= */
+
+.page-home .dost-messages {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  margin-top: 14px;
+}
+
+
+.page-home .dost-message {
+
+  max-width: 90%;
+
+  padding: 8px 10px;
+
+  border-radius: 5px;
+
+  font-size: 12.5px;
+
+  line-height: 1.45;
+}
+
+
+.page-home .dost-message.bot {
+
+  align-self: flex-start;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  border: 1px solid rgba(255, 255, 255, 0.12);
+
+  color: rgba(247, 246, 239, 0.86);
+}
+
+
+.page-home .dost-message.user {
+
+  align-self: flex-end;
+
+  background: var(--citizen-olive);
+
+  color: #ffffff;
+}
+
+
+/* =========================================================
+   27. DOST INPUT
+   ========================================================= */
+
+.page-home .dost-input-row {
+
+  display: flex;
+
+  gap: 7px;
+
+  padding: 11px 12px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+
+.page-home .dost-input-row input {
+
+  flex: 1;
+
+  min-width: 0;
+
+  min-height: 40px;
+
+  padding: 9px 10px;
+
+  border: 1px solid rgba(255, 255, 255, 0.16);
+
+  border-radius: 5px;
+
+  background: rgba(255, 255, 255, 0.06);
+
+  color: #ffffff;
+
+  font-size: 12.5px;
+}
+
+
+.page-home .dost-input-row input::placeholder {
+
+  color: rgba(247, 246, 239, 0.48);
+}
+
+
+.page-home .dost-input-row input:focus {
+
+  outline: 2px solid rgba(221, 197, 143, 0.30);
+
+  outline-offset: 1px;
+
+  border-color: var(--citizen-ochre-light);
+}
+
+
+.page-home .dost-input-row button {
+
+  min-width: 56px;
+
+  padding: 8px 10px;
+
+  border: 1px solid var(--citizen-olive-light);
+
+  border-radius: 5px;
+
+  background: var(--citizen-olive);
+
+  color: #ffffff;
+
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+
+.page-home .dost-input-row button:hover {
+
+  background: var(--citizen-olive-dark);
+
+  border-color: var(--citizen-olive-light);
+}
+
+
+/* =========================================================
+   28. DOST LAUNCHER
+   ========================================================= */
+
+.page-home .dost-open {
+
+  position: fixed;
+
+  right: 20px;
+  bottom: 20px;
+
+  z-index: 1501;
+
+  min-height: 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 9px 14px;
+
+  border: 1px solid var(--citizen-forest);
+
+  border-radius: 5px;
+
+  background: var(--citizen-forest);
+
+  color: #ffffff;
+
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 4px 12px rgba(24, 34, 28, 0.16);
+}
+
+
+.page-home .dost-open:hover {
+
+  background: var(--citizen-forest-dark);
+
+  border-color: var(--citizen-forest-dark);
+}
+
+
+.page-home .dost-open[aria-expanded="true"] {
+
+  display: none;
+}
+
+
+/* =========================================================
+   29. EMERGENCY MODAL
+   ========================================================= */
+
+.page-home .modal-overlay {
+
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2000;
+
+  padding: 20px;
+
+  background: rgba(18, 26, 21, 0.66);
+}
+
+
+.page-home .modal-overlay.hidden {
+
+  display: none;
+}
+
+
+.page-home .modal-box {
+
+  width: min(420px, 100%);
+
+  padding: 22px;
+
+  background: var(--citizen-paper-light);
+
+  border: 1px solid rgba(24, 34, 28, 0.24);
+
+  border-radius: 7px;
+
+  box-shadow: 0 12px 30px rgba(18, 26, 21, 0.22);
+}
+
+
+.page-home .modal-header {
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+
+  padding-bottom: 12px;
+
+  border-bottom: 1px solid rgba(24, 34, 28, 0.14);
+}
+
+
+.page-home .modal-header h2 {
+
+  margin: 0;
+
+  color: var(--citizen-ink);
+
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+
+  line-height: 1.2;
+}
+
+
+.page-home .modal-close {
+
+  width: 32px;
+  height: 32px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  border: 1px solid transparent;
+
+  border-radius: 5px;
+
+  background: transparent;
+
+  color: var(--citizen-muted);
+
+  font-size: 22px;
+
+  cursor: pointer;
+}
+
+
+.page-home .modal-close:hover {
+
+  border-color: rgba(24, 34, 28, 0.18);
+
+  background: rgba(24, 34, 28, 0.05);
+
+  color: var(--citizen-ink);
+}
+
+
+.page-home .modal-actions {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+
+.page-home .modal-action-btn {
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  padding: 13px 14px;
+
+  border: 1px solid rgba(24, 34, 28, 0.18);
+
+  border-radius: 5px;
+
+  background: #eeece1;
+
+  color: var(--citizen-ink);
+
+  text-decoration: none;
+}
+
+
+.page-home .modal-action-btn:hover {
+
+  background: #e5e2d4;
+
+  border-color: rgba(24, 34, 28, 0.28);
+}
+
+
+.page-home .modal-action-primary {
+
+  background: var(--citizen-red);
+
+  border-color: var(--citizen-red);
+
+  color: #ffffff;
+}
+
+
+.page-home .modal-action-primary:hover {
+
+  background: var(--citizen-red-dark);
+
+  border-color: var(--citizen-red-dark);
+}
+
+
+.page-home .modal-action-title {
+
+  color: inherit;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+
+.page-home .modal-action-desc {
+
+  color: rgba(24, 34, 28, 0.66);
+
+  font-size: 12px;
+
+  line-height: 1.4;
+}
+
+
+.page-home .modal-action-primary .modal-action-desc {
+
+  color: rgba(255, 255, 255, 0.78);
+}
+
+
+.page-home .modal-action-disabled {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   30. FOCUS STATES
+   ========================================================= */
+
+.page-home button:focus-visible,
+.page-home input:focus-visible,
+.page-home select:focus-visible,
+.page-home textarea:focus-visible {
+
+  outline: 3px solid rgba(72, 107, 118, 0.30);
+
+  outline-offset: 2px;
+}
+
+
+/* =========================================================
+   31. RESPONSIVE — LAPTOP
+   ========================================================= */
+
+@media (max-width: 1080px) {
+
+  .page-home .hero-decor {
+
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   32. RESPONSIVE — TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .page-home .citizen-grid,
+  .page-home .citizen-columns {
+
+    gap: 14px;
+  }
+
+
+  .page-home .dost-panel {
+
+    top: 76px;
+    right: 16px;
+
+    width: min(360px, calc(100vw - 32px));
+
+    max-height: calc(100vh - 92px);
+  }
+}
+
+
+/* =========================================================
+   33. RESPONSIVE — MOBILE
+   ========================================================= */
+
+@media (max-width: 650px) {
+
+  .page-home .citizen-hero {
+
+    padding-top: 26px;
+    padding-bottom: 24px;
+  }
+
+
+  .page-home .hero-main {
+
+    max-width: none;
+  }
+
+
+  .page-home .hero-ctas {
+
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 10px;
+  }
+
+
+  .page-home .hero-ctas-group {
+
+    flex-direction: column;
+    align-items: stretch;
+
+    width: 100%;
+
+    gap: 8px;
+  }
+
+
+  .page-home .cta-primary,
+  .page-home .in-danger-btn,
+  .page-home .cta-lostfound {
+
+    width: 100%;
+  }
+
+
+  .page-home .citizen-grid {
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+
+  .page-home .citizen-columns {
+
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+
+  .page-home .citizen-column {
+
+    gap: 12px;
+  }
+
+
+  .page-home .citizen-panel {
+
+    padding: 18px;
+  }
+
+
+  .page-home .hazard-fields-row {
+
+    grid-template-columns: 1fr;
+
+    gap: 16px;
+  }
+
+
+  .page-home .hazard-submit-row {
+
+    align-items: stretch;
+
+    flex-direction: column;
+
+    gap: 10px;
+  }
+
+
+  .page-home .post-btn {
+
+    width: 100%;
+  }
+
+
+  .page-home #announcements .announcement .time {
+
+    margin-left: 0;
+
+    flex-basis: 100%;
+  }
+
+
+  .page-home .shelter-entry-top {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+
+
+  .page-home .shelter-info-grid {
+
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* =========================================================
+   34. RESPONSIVE — SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+  .page-home .dost-panel {
+
+    top: 70px;
+    right: 12px;
+
+    width: calc(100vw - 24px);
+
+    max-height: calc(100vh - 84px);
+  }
+
+
+  .page-home .dost-open {
+
+    right: 12px;
+    bottom: 12px;
+  }
+}
+
+
+/* =========================================================
+   35. RESPONSIVE — VERY SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  .page-home .citizen-panel {
+
+    padding: 16px;
+  }
+
+
+  .page-home .citizen-panel h2 {
+
+    font-size: 20px;
+  }
+
+
+  .page-home .hazard-buttons {
+
+    display: grid;
+
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+
+  .page-home .hazard-btn {
+
+    width: 100%;
+
+    min-height: 44px;
+
+    padding: 8px;
+  }
+
+
+  .page-home .dost-actions {
+
+    grid-template-columns: 1fr;
+  }
+
+
+  .page-home .dost-action {
+
+    justify-content: flex-start;
+
+    min-height: 40px;
+
+    padding: 10px 11px;
+
+    text-align: left;
+  }
+}
+
+
+/* =========================================================
+   36. REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  .page-home *,
+  .page-home *::before,
+  .page-home *::after {
+
+    scroll-behavior: auto !important;
+
+    transition: none !important;
+
+    animation: none !important;
+  }
+}
