@@ -1,39 +1,8 @@
-/* =========================================================
-   SURAKSHANER
-   RESCUE & AUTHORITY PORTAL
-   VISUAL SYSTEM
-   =========================================================
+ 
 
-   Restyled to match the warm cream / pine-green palette used
-   across the rest of the site (see the Research & Inspection
-   page): light cream surfaces, dark pine-green for chrome and
-   the highest-stakes panel, ochre/red/blue for status accents.
-
-   Design direction:
-   - Light "field ops" surface — cream page background, white
-     cards, pine-green used for structure (header/hero button,
-     map panel header) and for the one dark accent block: the
-     Rescue Operations sidebar.
-   - Same type system as the rest of the site: Archivo (headings),
-     Source Sans 3 (body/UI), JetBrains Mono (data/eyebrows)
-   - Flat surfaces, hairline borders, no glow, no blur
-   - The Rescue Operations sidebar keeps its dark pine-green fill —
-     the one deliberate "highest-stakes panel" echo carried over
-     from the previous version
-   - Every ops tile renders at the same fixed height: label and
-     count share one row instead of the count getting its own
-     oversized line, so tiles with a live count (In Danger, SOS,
-     Hazard Reports, Road Connectivity) don't grow taller than
-     tiles without one (Recent Alerts, Risk Trajectory, Shelter
-     Info, Lost & Found)
-   - Fluid container width — no fixed-margin columns that leave
-     dead space on wide screens
-   ========================================================= */
-
-
-/* =========================================================
+/*  
    1. DESIGN TOKENS
-   ========================================================= */
+     */
 
 .rescue-page {
 
@@ -90,9 +59,9 @@
 }
 
 
-/* =========================================================
+/*  
    2. CONTAINER (shared width rule)
-   ========================================================= */
+     */
 
 .rescue-page .rescue-hero-inner,
 .rescue-page .rescue-content-grid {
@@ -106,9 +75,9 @@
 }
 
 
-/* =========================================================
+/*  
    3. HERO
-   ========================================================= */
+     */
 
 .rescue-page .rescue-hero {
 
@@ -162,9 +131,9 @@
 }
 
 
-/* =========================================================
+/*  
    4. CONTENT LAYOUT (80/20)
-   ========================================================= */
+     */
 
 .rescue-page .rescue-content-grid {
 
@@ -203,9 +172,9 @@
 }
 
 
-/* =========================================================
+/*  
    5. PANEL BASE (map section + AI dashboard share this)
-   ========================================================= */
+     */
 
 .rescue-page .rescue-panel {
 
@@ -261,9 +230,9 @@
 }
 
 
-/* =========================================================
+/*  
    6. MAP SEARCH SECTION
-   ========================================================= */
+     */
 
 .rescue-page .rescue-map-section {
 
@@ -557,9 +526,9 @@
 }
 
 
-/* =========================================================
+/*  
    7. AI RISK INTELLIGENCE
-   ========================================================= */
+     */
 
 .rescue-page .ai-risk-dashboard {
 
@@ -863,9 +832,9 @@
 }
 
 
-/* =========================================================
+/*  
    8. DEMO CONTROLS
-   ========================================================= */
+     */
 
 .rescue-page .ai-demo-controls {
 
@@ -904,9 +873,9 @@
 }
 
 
-/* =========================================================
+/*  
    9. BUTTONS (post-btn shared across rescue pages)
-   ========================================================= */
+     */
 
 .rescue-page .post-btn {
 
@@ -981,9 +950,9 @@
 }
 
 
-/* =========================================================
+/*  
    10. MAKE AN ANNOUNCEMENT PANEL
-   ========================================================= */
+     */
 
 .rescue-page .make-announcement-panel {
 
@@ -1054,10 +1023,10 @@
 }
 
 
-/* =========================================================
+/*  
    11. OPS SIDEBAR (kept dark pine-green — the one deliberate
    high-stakes accent block on this otherwise light page)
-   ========================================================= */
+     */
 
 .rescue-page .rescue-ops-sidebar {
 
@@ -1268,9 +1237,9 @@
 }
 
 
-/* =========================================================
+/*  
    12. SHARED LIST-ITEM BASE (sos-item / road-item)
-   ========================================================= */
+     */
 
 .rescue-page .sos-item,
 .rescue-page .road-item {
@@ -1331,16 +1300,11 @@
 }
 
 
-/* =========================================================
+/*  
    13. HIGH-RISK MAP MARKER PULSE
-   ========================================================= */
+     */
 
-/*
-   Kept from the previous implementation — a live map that pulses
-   its highest-risk marker is a functional life-safety affordance,
-   not decoration. Tied to the literal stroke color rescue.js sets
-   (#e74c3c); if that hex changes, update the selector here too.
-*/
+ 
 
 @keyframes pulse-glow {
   0% { filter: drop-shadow(0 0 3px #e74c3c); }
@@ -1353,9 +1317,9 @@
 }
 
 
-/* =========================================================
+/*  
    14. RESPONSIVE
-   ========================================================= */
+      */
 
 @media (max-width: 1080px) {
 

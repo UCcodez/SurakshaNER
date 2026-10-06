@@ -395,6 +395,10 @@ mqttClient.on('connect', () => {
   mqttClient.subscribe('sensors/#');
 });
 
+mqttClient.on('error', (err) => {
+  console.error('MQTT connection error (continuing without live sensor feed):', err.message);
+});
+
 mqttClient.on('message', (topic, message) => {
   try {
     const data = JSON.parse(message.toString());
@@ -827,7 +831,7 @@ demoOverrides.rainfall = null;
 demoOverrides.satellite = null;
 demoMode = 'normal';
 console.log('Startup: demo state reset to normal, no overrides active');
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });

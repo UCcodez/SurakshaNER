@@ -1,35 +1,9 @@
-/* =========================================================
-   SURAKSHANER
-   CITIZEN PORTAL
-   REFINED VISUAL SYSTEM — v2
-   =========================================================
-
-   This stylesheet controls Citizen-specific presentation.
-
-   Shared application styles remain in /style.css.
-   This file loads after /style.css and intentionally
-   overrides Citizen-page defaults where required.
-
-   Design direction:
-   - Warm paper foundation
-   - Muted earth / forest palette
-   - Distinct but related panel surfaces
-   - Semantic emergency red
-   - Restrained information ochre / blue
-   - Flat surfaces, strong hairline borders, minimal shadow
-   - No gradients, no glow, no glassmorphism
-   - Fluid container width — content should use the viewport,
-     not float in a fixed 1100px column with dead margins
-   - Type system with clear roles, not one font everywhere:
-       Space Grotesk  → headings
-       Source Sans 3  → body / UI / controls
-       JetBrains Mono → eyebrows, timestamps, data labels
-   ========================================================= */
+ 
 
 
-/* =========================================================
+/*  - 
    1. DESIGN TOKENS
-   ========================================================= */
+     */
 
 .page-home {
 
@@ -42,10 +16,7 @@
   --citizen-forest-dark: #16281f;
   --citizen-forest-mid: #304936;
 
-  /* Distinct from forest-dark on purpose — the nav bar, CTA
-     buttons, and DOST launcher already use forest-dark, so
-     Alert Authorities gets its own pine-green identity rather
-     than blending into "the dark green that's everywhere." */
+   
   --citizen-pine: #1e3a30;
   --citizen-pine-dark: #142a22;
 
@@ -66,14 +37,9 @@
   --citizen-blue: #486b76;
   --citizen-blue-light: #d7e1e2;
 
-  /* Shelter panel — a muted teal-sage, kept in the same earth/
-     forest family as the rest of the palette but distinct from
-     pine (Alert Authorities), olive (Announcements) and blue
-     (Lost & Found), so "Find Shelter" reads as its own category
-     rather than a repeat of an existing panel. */
-  --citizen-sage: #3d5c53;
-  --citizen-sage-dark: #2a4139;
-  --citizen-sage-light: #9dbcae;
+  /* Find Shelter panel —  */
+  --citizen-teal: #2f5a52;
+  --citizen-teal-light: #cfe3dd;
 
   --citizen-white: #f7f6ef;
 
@@ -83,10 +49,7 @@
   --citizen-radius: 7px;
   --citizen-radius-small: 5px;
 
-  /* Fluid content container — replaces the old fixed
-     min(1100px, ...) cap that left large dead gutters
-     on wide screens. Content now scales with viewport
-     up to a generous ceiling. */
+  /* Fluid content container —   */
   --citizen-container-max: 1440px;
   --citizen-container-pad: clamp(20px, 4vw, 64px);
 
@@ -104,9 +67,9 @@
 }
 
 
-/* =========================================================
+/*  
    2. ACCESSIBILITY
-   ========================================================= */
+     */
 
 .page-home .sr-only {
   position: absolute;
@@ -126,9 +89,9 @@
 }
 
 
-/* =========================================================
+/*  
    3. GLOBAL BOX MODEL
-   ========================================================= */
+     */
 
 .page-home *,
 .page-home *::before,
@@ -137,10 +100,11 @@
 }
 
 
-/* =========================================================
+/*  
    4. CONTAINER (shared width rule)
-   ========================================================= */
+     */
 
+ 
 .page-home .citizen-hero,
 .page-home .citizen-grid,
 .page-home .citizen-grid-single,
@@ -155,9 +119,9 @@
 }
 
 
-/* =========================================================
+/*  
    5. HERO
-   ========================================================= */
+     */
 
 .page-home .citizen-hero {
 
@@ -234,9 +198,9 @@
 }
 
 
-/* =========================================================
+/*  
    6. HERO DECORATION (regional identity block)
-   ========================================================= */
+     */
 
 .page-home .hero-decor {
 
@@ -287,14 +251,13 @@
   width: min(260px, 22vw);
   height: 80px;
 
-  /* Placeholder slot — drop in the mountain-range motif
-     (SVG or PNG, transparent background) here. */
+  /* Placeholder slot —   */
 }
 
 
-/* =========================================================
+/*  
    7. HERO ACTIONS
-   ========================================================= */
+     */
 
 .page-home .hero-ctas {
 
@@ -403,8 +366,7 @@
 }
 
 
-/* Lost & Found — ochre, not red, so it reads as "worth noticing"
-   without borrowing SOS's urgency. */
+/* Lost & Found —   */
 
 .page-home .cta-lostfound {
 
@@ -457,78 +419,86 @@
 }
 
 
-/* =========================================================
-   8. ICON PLACEHOLDER SYSTEM
-   ========================================================= */
+/*  
+   8. ICON SYSTEM
+     */
 
-/*
-   Empty by design — drop an <svg> or <img> inside each
-   .ui-icon / .panel-icon span. Sizing is reserved so layout
-   does not shift once icons are added.
-*/
+ 
 
 .page-home .ui-icon {
-
-  width: 17px;
-  height: 17px;
-
-  flex: 0 0 17px;
+  width: 50px;
+  height: 50px;
+  flex: 0 0 50px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
-
 .page-home .ui-icon svg,
 .page-home .ui-icon img {
-
-  width: 100%;
-  height: 100%;
+  width: 92%;
+  height: 92%;
 
   display: block;
-
-  color: currentColor;
+  object-fit: contain;
 }
 
 
+/* Hazard buttons —   */
+
 .page-home .hazard-btn .ui-icon {
-
-  width: 18px;
-  height: 18px;
-
-  flex-basis: 18px;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
 }
 
 
 /* Panel heading icon chip */
 
 .page-home .panel-icon {
-
-  width: 34px;
-  height: 34px;
-
-  flex: 0 0 34px;
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  border-radius: 6px;
+  border-radius: 8px;
 
   background: rgba(255, 255, 255, 0.14);
 }
 
+.page-home .panel-icon img,
+.page-home .panel-icon svg {
+  width: 80%;
+  height: 80%;
+
+  display: block;
+  object-fit: contain;
+}
+
+
+/* Hazard panel heading */
 
 .page-home .hazard-panel .panel-icon {
-
   background: rgba(24, 34, 28, 0.10);
 }
 
 
-/* =========================================================
+ 
+
+.page-home .shelter-location .ui-icon,
+.page-home .shelter-call .ui-icon {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
+}
+
+/*  
    9. MAIN CONTENT
-   ========================================================= */
+     */
 
 .page-home .citizen-content {
 
@@ -554,41 +524,35 @@
 }
 
 
-/* ---------------------------------------------------------
-   Two-column layout — each column stacks a different number
-   of panels (left: 2, right: 3), so this is a pair of flex
-   columns inside a grid rather than a fixed-row grid. Columns
-   are independent, so one running longer than the other never
-   stretches or misaligns its neighbour.
-   --------------------------------------------------------- */
+ 
 
 .page-home .citizen-columns {
 
-  display: grid;
-
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
+  display: flex;
+  align-items: flex-start;
 
   gap: 18px;
 
-  padding: 0 0 18px;
+  padding: 0 0 36px;
 }
 
 
-.page-home .citizen-column {
+.page-home .citizen-col {
+
+  min-width: 0;
+
+  flex: 1 1 0;
 
   display: flex;
   flex-direction: column;
 
-  min-width: 0;
-
   gap: 18px;
 }
 
 
-/* =========================================================
+/*  
    10. BASE PANEL
-   ========================================================= */
+     */
 
 .page-home .citizen-panel {
 
@@ -606,20 +570,11 @@
 }
 
 
-/* =========================================================
+/*  
    11. PANEL COLOUR LANGUAGE
-   ========================================================= */
+     */
 
-/*
-   The panels intentionally do NOT share one colour.
-   They belong to the same muted earth/forest family,
-   but colour differentiates information categories:
 
-   - Alert Authorities  → darkest forest  (highest stakes)
-   - Announcements       → olive           (ambient information)
-   - Hazard report       → warm tan        (citizen input, light surface)
-   - Find Shelter         → sage / teal     (safe-haven information)
-*/
 
 .page-home .citizen-sos-panel {
 
@@ -647,11 +602,9 @@
 }
 
 
-/* ---------------------------------------------------------
-   Lost & Found — blue, matching the "info" semantic used for
-   announcements. This is a community-support feature, not an
-   emergency one, so it deliberately isn't red or forest green.
-   --------------------------------------------------------- */
+/*  
+   Lost & Found —  
+     */
 
 .page-home .lostfound-panel {
 
@@ -661,22 +614,20 @@
 }
 
 
-/* ---------------------------------------------------------
-   Find Shelter — sage/teal, its own "safe haven" identity,
-   distinct from every other panel colour on the page.
-   --------------------------------------------------------- */
+/*  
+   Find Shelter  */
 
 .page-home .shelter-panel {
 
-  background: var(--citizen-sage);
+  background: var(--citizen-teal);
 
-  border-color: rgba(20, 34, 30, 0.40);
+  border-color: rgba(10, 30, 26, 0.4);
 }
 
 
-/* =========================================================
+/*  
    12. PANEL HEADINGS
-   ========================================================= */
+     */
 
 .page-home .panel-heading {
 
@@ -779,9 +730,9 @@
 }
 
 
-/* =========================================================
+/*  
    13. FORM STRUCTURE
-   ========================================================= */
+     */
 
 .page-home .form-group {
 
@@ -837,6 +788,24 @@
 }
 
 
+ 
+
+.page-home .field-required {
+
+  margin-left: 4px;
+
+  color: var(--citizen-red);
+
+  font-weight: 700;
+}
+
+
+.page-home .citizen-sos-panel .field-required {
+
+  color: #ff8f88;
+}
+
+
 /* Hazard fields sit side by side on wide screens */
 
 .page-home .hazard-fields-row {
@@ -849,9 +818,9 @@
 }
 
 
-/* =========================================================
+/*  
    14. FORM CONTROLS
-   ========================================================= */
+     */
 
 .page-home input,
 .page-home select,
@@ -865,7 +834,6 @@
 
 
 .page-home .citizen-panel input[type="number"],
-.page-home .citizen-panel input[type="search"],
 .page-home .citizen-panel select,
 .page-home .citizen-panel textarea {
 
@@ -912,9 +880,9 @@
 }
 
 
-/* ---------------------------------------------------------
+/*  
    File field (styled wrapper around input[type=file])
-   --------------------------------------------------------- */
+     */
 
 .page-home .file-field {
 
@@ -981,9 +949,9 @@
 }
 
 
-/* ---------------------------------------------------------
+/*  
    Controls inside Alert Authorities
-   --------------------------------------------------------- */
+     */
 
 .page-home .citizen-sos-panel input[type="number"],
 .page-home .citizen-sos-panel select {
@@ -994,29 +962,9 @@
 }
 
 
-/* ---------------------------------------------------------
-   Controls inside Find Shelter
-   --------------------------------------------------------- */
-
-.page-home .shelter-panel input[type="search"] {
-
-  background: rgba(255, 255, 255, 0.08);
-
-  border-color: rgba(255, 255, 255, 0.22);
-
-  color: var(--citizen-white);
-}
-
-
-.page-home .shelter-panel input[type="search"]::placeholder {
-
-  color: rgba(247, 246, 239, 0.55);
-}
-
-
-/* ---------------------------------------------------------
+/*  
    Focus
-   --------------------------------------------------------- */
+    */
 
 .page-home .citizen-panel input:focus,
 .page-home .citizen-panel select:focus,
@@ -1031,25 +979,27 @@
 }
 
 
-/* =========================================================
+/*  
    15. SOS BUTTON
-   ========================================================= */
+
+    
+     */
 
 .page-home .sos-btn {
 
   width: 100%;
 
-  min-height: 54px;
+  min-height: 42px;
 
   display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  gap: 9px;
+  gap: 8px;
 
-  margin-top: 22px;
+  margin-top: 16px;
 
-  padding: 14px 20px;
+  padding: 9px 16px;
 
   border: 1px solid var(--citizen-red-dark);
 
@@ -1060,10 +1010,10 @@
   color: #ffffff;
 
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
 
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
 
   cursor: pointer;
 
@@ -1071,6 +1021,14 @@
     background-color 100ms ease,
     border-color 100ms ease,
     transform 80ms ease;
+}
+
+
+.page-home .sos-btn .ui-icon {
+
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
 }
 
 
@@ -1100,9 +1058,9 @@
 }
 
 
-/* =========================================================
+/*  
    16. STATUS MESSAGES / FOOTNOTES
-   ========================================================= */
+     */
 
 .page-home .citizen-status {
 
@@ -1153,9 +1111,9 @@
 }
 
 
-/* =========================================================
+/*  
    17. ANNOUNCEMENTS
-   ========================================================= */
+     */
 
 .page-home #announcements {
 
@@ -1263,9 +1221,9 @@
 }
 
 
-/* =========================================================
+/*  
    17b. ANNOUNCEMENTS PAGINATION
-   ========================================================= */
+     */
 
 .page-home .announcements-pagination {
 
@@ -1344,9 +1302,9 @@
 }
 
 
-/* =========================================================
+/*  
    18. ANNOUNCEMENT LEVEL VARIANTS
-   ========================================================= */
+     */
 
 .page-home #announcements .announcement.high-risk {
 
@@ -1396,9 +1354,9 @@
 }
 
 
-/* =========================================================
+/*  
    19. HAZARD BUTTONS
-   ========================================================= */
+     */
 
 .page-home .hazard-buttons {
 
@@ -1464,9 +1422,9 @@
 }
 
 
-/* =========================================================
+/*  
    20. HAZARD SUBMIT
-   ========================================================= */
+     */
 
 .page-home .hazard-submit-row {
 
@@ -1535,9 +1493,9 @@
 }
 
 
-/* =========================================================
+/*  
    20b. LOST & FOUND
-   ========================================================= */
+     */
 
 .page-home .lostfound-report,
 .page-home .lostfound-browse {
@@ -1651,6 +1609,14 @@
 }
 
 
+.page-home .lf-search-btn .ui-icon {
+
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+
 .page-home .lf-search-btn:hover {
 
   background: rgba(255, 255, 255, 0.18);
@@ -1668,6 +1634,8 @@
   gap: 7px;
 
   margin-bottom: 14px;
+
+  flex-wrap: wrap;
 }
 
 
@@ -1883,6 +1851,37 @@
 }
 
 
+/* Small category/subtitle line under the name, e.g.
+   "Missing Person · Age reported" */
+
+.page-home .lf-meta {
+
+  display: block;
+
+  margin-top: 2px;
+
+  color: #6a746d;
+
+  font-size: 11.5px;
+
+  line-height: 1.4;
+}
+
+
+/* Free-text description paragraph */
+
+.page-home .lf-desc {
+
+  margin: 8px 0 0;
+
+  color: #3f4a43;
+
+  font-size: 12.5px;
+
+  line-height: 1.5;
+}
+
+
 .page-home .lf-callout {
 
   margin-top: 7px;
@@ -1929,11 +1928,24 @@
 
 .page-home .lf-call {
 
+  display: inline-flex;
+  align-items: center;
+
+  gap: 5px;
+
   color: var(--citizen-forest);
 
   font-weight: 700;
 
   text-decoration: none;
+}
+
+
+.page-home .lf-call .ui-icon {
+
+  width: 14px;
+  height: 14px;
+  flex: 0 0 14px;
 }
 
 
@@ -1943,18 +1955,79 @@
 }
 
 
-/* =========================================================
+/*  
    20c. FIND SHELTER
-   ========================================================= */
+     */
 
-.page-home .shelter-list {
+.page-home .shelter-search-row {
+
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 14px;
+
+  padding: 0 12px;
+
+  border: 1px solid rgba(255, 255, 255, 0.22);
+
+  border-radius: var(--citizen-radius-small);
+
+  background: rgba(255, 255, 255, 0.08);
+}
+
+
+.page-home .shelter-search-row .ui-icon {
+
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+
+  color: rgba(255, 255, 255, 0.55);
+}
+
+
+.page-home #shelterSearch {
+
+  flex: 1;
+  min-width: 0;
+
+  min-height: 40px;
+
+  padding: 8px 0;
+
+  border: none;
+
+  background: transparent;
+
+  color: var(--citizen-white);
+
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+
+.page-home #shelterSearch::placeholder {
+
+  color: rgba(247, 246, 239, 0.55);
+}
+
+
+.page-home #shelterSearch:focus {
+
+  outline: none;
+}
+
+
+.page-home #shelterList {
 
   display: flex;
   flex-direction: column;
 
   gap: 10px;
 
-  max-height: 420px;
+  max-height: 460px;
 
   overflow-y: auto;
 }
@@ -1972,18 +2045,7 @@
 }
 
 
-.page-home .shelter-footnote {
-
-  color: rgba(247, 246, 239, 0.56);
-}
-
-
-/* Entry card — same light "readout" surface as lf-entry /
-   announcement cards, so the whole page shares one card
-   language even though each panel behind it is a different
-   colour. */
-
-.page-home .shelter-entry {
+.page-home .shelter-card {
 
   padding: 14px;
 
@@ -1991,21 +2053,19 @@
 
   border: 1px solid rgba(24, 34, 28, 0.14);
 
-  border-radius: 7px;
+  border-radius: 6px;
 
   color: var(--citizen-ink);
 }
 
 
-.page-home .shelter-entry-top {
+.page-home .shelter-card-top {
 
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
 
   gap: 10px;
-
-  margin-bottom: 10px;
 }
 
 
@@ -2015,11 +2075,8 @@
 
   color: var(--citizen-ink);
 
-  font-family: var(--font-display);
-  font-size: 14.5px;
+  font-size: 14px;
   font-weight: 700;
-
-  line-height: 1.3;
 }
 
 
@@ -2034,135 +2091,138 @@
 
   color: #5c665f;
 
-  font-size: 12px;
+  font-size: 11.5px;
 }
 
 
 .page-home .shelter-location .ui-icon {
 
-  width: 12px;
-  height: 12px;
-
-  flex-basis: 12px;
+  color: #5c665f;
 }
 
 
-.page-home .shelter-occupancy-badge {
+.page-home .shelter-capacity-badge {
 
   flex: 0 0 auto;
 
   padding: 4px 9px;
 
-  border-radius: 5px;
+  border-radius: 999px;
+
+  background: #e1e8d8;
+
+  color: #46602f;
 
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
 
   white-space: nowrap;
-
-  background: #e1e8d8;
-  color: #46602f;
 }
 
 
-.page-home .shelter-occupancy-badge.caution {
+/* Occupancy-level variants — same badge shape, colour shifts
+   from the existing "safe" green toward the existing amber
+   (used already for announcement warnings) and existing red
+   tokens as a shelter fills up. No new colours introduced. */
+
+.page-home .shelter-capacity-badge.caution {
 
   background: #f1e3c8;
+
   color: #7a5a24;
 }
 
 
-.page-home .shelter-occupancy-badge.full {
+.page-home .shelter-capacity-badge.full {
 
   background: var(--citizen-red-light);
+
   color: var(--citizen-red-dark);
 }
 
 
-/* Occupancy bar */
-
-.page-home .shelter-progress {
+.page-home .shelter-bar {
 
   height: 6px;
 
-  margin-bottom: 12px;
+  margin-top: 10px;
+
+  overflow: hidden;
 
   border-radius: 999px;
 
-  background: rgba(24, 34, 28, 0.10);
-
-  overflow: hidden;
+  background: rgba(24, 34, 28, 0.12);
 }
 
 
-.page-home .shelter-progress-fill {
+.page-home .shelter-bar span {
+
+  display: block;
 
   height: 100%;
 
-  border-radius: 999px;
+  border-radius: inherit;
 
-  background: #5d7c4c;
-
-  transition: width 200ms ease;
+  background: var(--citizen-teal);
 }
 
 
-.page-home .shelter-occupancy-badge.caution ~ .shelter-progress .shelter-progress-fill,
-.page-home .shelter-entry.is-caution .shelter-progress-fill {
+.page-home .shelter-bar.caution span {
 
-  background: var(--citizen-ochre);
+  background: #b3852f;
 }
 
 
-.page-home .shelter-entry.is-full .shelter-progress-fill {
+.page-home .shelter-bar.full span {
 
   background: var(--citizen-red);
 }
 
 
-/* Info grid: Water / Doctor / Rations / Incharge */
-
-.page-home .shelter-info-grid {
+.page-home .shelter-details {
 
   display: grid;
 
   grid-template-columns: repeat(2, minmax(0, 1fr));
 
-  gap: 8px 14px;
+  gap: 8px 16px;
+
+  margin-top: 12px;
 }
 
 
-.page-home .shelter-info-item {
+.page-home .shelter-detail {
 
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
 
-  font-size: 12.5px;
-  line-height: 1.4;
+  gap: 2px;
 }
 
 
-.page-home .shelter-info-label {
+.page-home .shelter-detail span {
 
-  display: block;
+  color: #68716a;
 
-  color: #7c867e;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 600;
 
-  font-size: 11px;
+  letter-spacing: 0.3px;
+
+  text-transform: uppercase;
 }
 
 
-.page-home .shelter-info-value {
-
-  display: block;
+.page-home .shelter-detail strong {
 
   color: var(--citizen-ink);
 
+  font-size: 12.5px;
   font-weight: 600;
 }
 
-
-/* Footer: call + certification */
 
 .page-home .shelter-footer {
 
@@ -2176,7 +2236,7 @@
 
   padding-top: 10px;
 
-  border-top: 1px solid rgba(24, 34, 28, 0.10);
+  border-top: 1px solid rgba(24, 34, 28, 0.12);
 }
 
 
@@ -2187,12 +2247,18 @@
 
   gap: 6px;
 
-  color: var(--citizen-forest);
+  color: var(--citizen-teal);
 
   font-size: 12.5px;
   font-weight: 700;
 
   text-decoration: none;
+}
+
+
+.page-home .shelter-call .ui-icon {
+
+  color: var(--citizen-teal);
 }
 
 
@@ -2202,19 +2268,19 @@
 }
 
 
-.page-home .shelter-certified {
+.page-home .shelter-tag {
 
-  color: #7c867e;
+  color: #68716a;
 
-  font-size: 11px;
+  font-size: 10.5px;
 
   white-space: nowrap;
 }
 
 
-/* =========================================================
+/*  
    21. DOST ASSISTANCE PANEL
-   ========================================================= */
+     */
 
 .page-home .dost-panel {
 
@@ -2250,9 +2316,9 @@
 }
 
 
-/* =========================================================
+/*  
    22. DOST HEADER
-   ========================================================= */
+     */
 
 .page-home .dost-header {
 
@@ -2331,9 +2397,9 @@
 }
 
 
-/* =========================================================
+/*  
    23. DOST BODY
-   ========================================================= */
+     */
 
 .page-home .dost-body {
 
@@ -2385,9 +2451,9 @@
 }
 
 
-/* =========================================================
+/*  
    24. DOST SUGGESTIONS
-   ========================================================= */
+     */
 
 .page-home .dost-suggestions {
 
@@ -2431,9 +2497,9 @@
 }
 
 
-/* =========================================================
+/*  
    25. DOST QUICK ACTIONS
-   ========================================================= */
+     */
 
 .page-home .dost-actions {
 
@@ -2501,9 +2567,9 @@
 }
 
 
-/* =========================================================
+/*  
    26. DOST MESSAGES
-   ========================================================= */
+     */
 
 .page-home .dost-messages {
 
@@ -2552,9 +2618,9 @@
 }
 
 
-/* =========================================================
+/*  
    27. DOST INPUT
-   ========================================================= */
+     */
 
 .page-home .dost-input-row {
 
@@ -2636,9 +2702,9 @@
 }
 
 
-/* =========================================================
+/*  
    28. DOST LAUNCHER
-   ========================================================= */
+     */
 
 .page-home .dost-open {
 
@@ -2677,6 +2743,14 @@
 }
 
 
+.page-home .dost-open .ui-icon {
+
+  width: 20px;
+  height: 20px;
+  flex: 0 0 20px;
+}
+
+
 .page-home .dost-open:hover {
 
   background: var(--citizen-forest-dark);
@@ -2691,9 +2765,9 @@
 }
 
 
-/* =========================================================
+/*  
    29. EMERGENCY MODAL
-   ========================================================= */
+     */
 
 .page-home .modal-overlay {
 
@@ -2889,9 +2963,9 @@
 }
 
 
-/* =========================================================
+/*  
    30. FOCUS STATES
-   ========================================================= */
+     */
 
 .page-home button:focus-visible,
 .page-home input:focus-visible,
@@ -2904,9 +2978,9 @@
 }
 
 
-/* =========================================================
+/*  
    31. RESPONSIVE — LAPTOP
-   ========================================================= */
+     */
 
 @media (max-width: 1080px) {
 
@@ -2917,16 +2991,23 @@
 }
 
 
-/* =========================================================
+/*  
    32. RESPONSIVE — TABLET
-   ========================================================= */
+     */
 
 @media (max-width: 900px) {
 
-  .page-home .citizen-grid,
-  .page-home .citizen-columns {
+  .page-home .citizen-grid {
 
     gap: 14px;
+  }
+
+
+  .page-home .citizen-columns {
+
+    flex-direction: column;
+
+    gap: 16px;
   }
 
 
@@ -2942,9 +3023,9 @@
 }
 
 
-/* =========================================================
+/*  
    33. RESPONSIVE — MOBILE
-   ========================================================= */
+     */
 
 @media (max-width: 650px) {
 
@@ -2999,13 +3080,7 @@
 
   .page-home .citizen-columns {
 
-    grid-template-columns: 1fr;
-
-    gap: 12px;
-  }
-
-
-  .page-home .citizen-column {
+    flex-direction: column;
 
     gap: 12px;
   }
@@ -3047,26 +3122,12 @@
 
     flex-basis: 100%;
   }
-
-
-  .page-home .shelter-entry-top {
-
-    flex-direction: column;
-
-    align-items: flex-start;
-  }
-
-
-  .page-home .shelter-info-grid {
-
-    grid-template-columns: 1fr;
-  }
 }
 
 
-/* =========================================================
+/*  
    34. RESPONSIVE — SMALL MOBILE
-   ========================================================= */
+     */
 
 @media (max-width: 520px) {
 
@@ -3089,9 +3150,9 @@
 }
 
 
-/* =========================================================
+/*  
    35. RESPONSIVE — VERY SMALL MOBILE
-   ========================================================= */
+     */
 
 @media (max-width: 420px) {
 
@@ -3144,9 +3205,9 @@
 }
 
 
-/* =========================================================
+/*  
    36. REDUCED MOTION
-   ========================================================= */
+     */
 
 @media (prefers-reduced-motion: reduce) {
 

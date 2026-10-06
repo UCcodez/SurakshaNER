@@ -1,45 +1,4 @@
-"""
-predict_service.py
--------------------
-Small Flask microservice that loads the trained scikit-learn models
-(sensor ExtraTrees classifier, rainfall/severity Random Forest classifier)
-and exposes them as simple HTTP endpoints.
-
-WHY THIS EXISTS:
-Our main backend (server.js) is Node.js/Express, but our ML models are
-trained in Python (scikit-learn). Node can't directly run a .pkl file,
-so this service acts as a small bridge: Node makes a normal HTTP request
-to this service, this service runs the actual model, and sends back a
-JSON response Node can use like any other API call.
-
-HOW TO RUN (for local development):
-    pip install flask scikit-learn pandas joblib
-    python predict_service.py
-    -> service starts on http://localhost:5001
-
-HOW server.js WOULD CALL THIS (example, not yet wired into server.js):
-    const res = await fetch('http://localhost:5001/predict-sensor-risk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            soil_moisture_pct: 28.5,
-            tilt_change_deg: 1.1,
-            vibration_events_per_hr: 6,
-            pore_pressure_kpa: 0.34,
-            rainfall_mm_24hr: 180
-        })
-    });
-    const data = await res.json();
-    // data.risk_probability, data.risk_label
-
-STATUS: Currently a standalone service, not yet called from server.js.
-Full integration (Node -> this service -> live sensor stream) is planned
-for the December build phase, once live satellite/sensor feeds replace
-the current trained-on-historical-data models.
-"""
-
 import numpy as np
-
 from flask import Flask, request, jsonify
 import pickle
 import pandas as pd
@@ -52,14 +11,12 @@ app = Flask(__name__)
 
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# ---- Load models once at startup (not per-request, for speed) ----
 with open(os.path.join(MODEL_DIR, 'sensor_extratrees_model.pkl'), 'rb') as f:
     sensor_model = pickle.load(f)
 
 with open(os.path.join(MODEL_DIR, 'landslide_rf_model.pkl'), 'rb') as f:
     rainfall_model = pickle.load(f)
 
-# Exact normalization stats from training (dataset/landslide_dataset.py)
 SATELLITE_MEAN = [-0.4914, -0.3074, -0.1277, -0.0625, 0.0439, 0.0803, 0.0644, 0.0802, 0.3000, 0.4082, 0.0823, 0.0516, 0.3338, 0.7819]
 SATELLITE_STD = [0.9325, 0.8775, 0.8860, 0.8869, 0.8857, 0.8418, 0.8354, 0.8491, 0.9061, 1.6072, 0.8848, 0.9232, 0.9018, 1.2913]
 
@@ -70,13 +27,8 @@ satellite_checkpoint = torch.load(
 satellite_model.load_state_dict(satellite_checkpoint)
 satellite_model.eval()
 
-
-# Exact feature column order the rainfall model was trained on
-# (needed because the model was trained on one-hot encoded categorical
-# columns - any new input must be reshaped to match this exact structure)
 rainfall_columns = rainfall_model.feature_names_in_.tolist()
 
-# Sensor model's expected column order (no encoding needed, all numeric)
 SENSOR_FEATURES = [
     'soil_moisture_pct',
     'tilt_change_deg',
@@ -88,7 +40,6 @@ SENSOR_FEATURES = [
 
 @app.route('/health', methods=['GET'])
 def health():
-    """Quick check that the service is up and models loaded correctly."""
     return jsonify({
         'status': 'ok',
         'models_loaded': ['sensor_extratrees', 'rainfall_random_forest']
@@ -97,21 +48,6 @@ def health():
 
 @app.route('/predict-sensor-risk', methods=['POST'])
 def predict_sensor_risk():
-    """
-    Expects JSON body:
-    {
-        "soil_moisture_pct": float,
-        "tilt_change_deg": float,
-        "vibration_events_per_hr": float,
-        "pore_pressure_kpa": float,
-        "rainfall_mm_24hr": float
-    }
-    Returns:
-    {
-        "risk_probability": float (0-1),
-        "risk_label": "normal" | "high_risk"
-    }
-    """
     data = request.get_json()
 
     missing = [f for f in SENSOR_FEATURES if f not in data]
@@ -120,7 +56,7 @@ def predict_sensor_risk():
 
     row = pd.DataFrame([{f: data[f] for f in SENSOR_FEATURES}])
 
-    proba = sensor_model.predict_proba(row)[0][1]  # probability of class "1" (high_risk)
+    proba = sensor_model.predict_proba(row)[0][1]
     label = 'high_risk' if proba >= 0.5 else 'normal'
 
     return jsonify({
@@ -131,23 +67,17 @@ def predict_sensor_risk():
 
 @app.route('/predict-satellite-risk', methods=['GET'])
 def predict_satellite_risk():
-    """
-    NOTE: Currently uses a fixed sample satellite image (from the
-    Landslide4Sense validation set) as a stand-in input, since live
-    per-zone Sentinel-2 imagery integration (Google Earth Engine /
-    Copernicus) is planned for the December build phase, not yet built.
-    """
     with h5py.File(os.path.join(MODEL_DIR, 'sample_satellite_image.h5'), 'r') as hf:
         image = hf['img'][:]
 
     image = np.asarray(image, np.float32)
-    image = image.transpose((-1, 0, 1))  # channels-first, matching training
+    image = image.transpose((-1, 0, 1))
 
     for i in range(len(SATELLITE_MEAN)):
         image[i, :, :] -= SATELLITE_MEAN[i]
         image[i, :, :] /= SATELLITE_STD[i]
 
-    image_tensor = torch.from_numpy(image).unsqueeze(0)  # add batch dimension
+    image_tensor = torch.from_numpy(image).unsqueeze(0)
 
     with torch.no_grad():
         logits = satellite_model(image_tensor)
@@ -163,38 +93,11 @@ def predict_satellite_risk():
         'note': 'Using sample validation image, not live satellite feed (planned for December build)'
     })
 
+
 @app.route('/predict-rainfall-severity', methods=['POST'])
 def predict_rainfall_severity():
-    """
-    Expects JSON body describing an event, e.g.:
-    {
-        "landslide_trigger": "downpour",
-        "landslide_category": "landslide",
-        "landslide_setting": "above_road",
-        "month": 7,
-        "log_population": 10.2,
-        "gazeteer_distance": 5.0
-    }
-    Returns:
-    {
-        "high_severity_probability": float (0-1),
-        "severity_label": "low_severity" | "high_severity"
-    }
-
-    NOTE: This model was trained on the NASA Global Landslide Catalog
-    (metadata-based), not live rainfall telemetry. Treat this as a
-    starting point for the "rainfall model" slot in our fusion
-    architecture - swapping in real Open-Meteo-derived features
-    (rainfall intensity/duration) is the natural next upgrade.
-    """
     data = request.get_json()
 
-    # Build a one-row dataframe matching the categorical inputs, then
-    # one-hot encode and reindex to match exactly what the model saw
-    # during training (missing categories get filled with 0).
-        # Build the row directly, matching the exact training columns and
-    # order - avoids the fragile get_dummies + reindex approach, which
-    # can produce a feature-name/order mismatch scikit-learn rejects.
     row = pd.DataFrame(0.0, index=[0], columns=rainfall_columns)
 
     trigger_col = f"landslide_trigger_{data.get('landslide_trigger', 'unknown')}"
@@ -224,5 +127,5 @@ def predict_rainfall_severity():
 
 if __name__ == '__main__':
     print("Starting ML prediction service on http://localhost:5001")
-    print("Available endpoints: /health, /predict-sensor-risk, /predict-rainfall-severity")
+    print("Available endpoints: /health, /predict-sensor-risk, /predict-satellite-risk, /predict-rainfall-severity")
     app.run(host='0.0.0.0', port=5001, debug=True)

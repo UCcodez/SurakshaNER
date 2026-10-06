@@ -74,8 +74,8 @@ body {
 
 /* Empty by design — drop the mountain/shield mark in here. */
 .nav-logo {
-  width: 26px;
-  height: 26px;
+  width: 58px;
+  height: 58px;
   flex: 0 0 26px;
   display: inline-flex;
   align-items: center;

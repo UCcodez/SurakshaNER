@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/citizen/citizen.css">
 
-  <!-- Fonts: Space Grotesk (headings), Source Sans 3 (body/UI), JetBrains Mono (eyebrows/data) -->
+   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -19,6 +19,7 @@
 
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#16281f">
+
 </head>
 
 <body class="page-home">
@@ -28,9 +29,9 @@
     window.NAV_CURRENT = 'citizen';
   </script>
 
-  <!-- =========================
+  <!--   -
        SHARED NAVIGATION
-  ========================== -->
+     -->
   <div id="site-navbar"></div>
 
   <!-- Active emergency / system alert banner -->
@@ -41,9 +42,9 @@
   ></div>
 
 
-  <!-- =========================
+  <!--   -
        CITIZEN HERO
-  ========================== -->
+     -->
   <section class="hero citizen-hero">
 
     <div class="hero-inner">
@@ -72,7 +73,10 @@
               class="in-danger-btn"
             >
               <span class="ui-icon" aria-hidden="true">
-                <!-- icon: sos / broadcast -->
+                <img
+                    src="/icons1/sos.svg"
+                    alt=""
+                />
               </span>
 
               SOS
@@ -86,9 +90,9 @@
               type="button"
               class="cta-primary open-emergency-modal"
             >
-              <span class="ui-icon" aria-hidden="true">
-                <!-- icon: shield / emergency-services -->
-              </span>
+                <span class="ui-icon" aria-hidden="true">
+                    <img src="/icons1/emergency.png" alt="">
+                </span>
 
               Emergency Services
             </button>
@@ -97,9 +101,9 @@
               href="#lostFoundSection"
               class="cta-lostfound"
             >
-              <span class="ui-icon" aria-hidden="true">
-                <!-- icon: search / lost-and-found -->
-              </span>
+                <span class="ui-icon" aria-hidden="true">
+                    <img src="/icons1/search.svg" alt="">
+                </span>
 
               Lost &amp; Found
             </a>
@@ -132,18 +136,17 @@
   </section>
 
 
-  <!-- =========================
+  <!--   -
        MAIN CITIZEN CONTENT
-  ========================== -->
+     -->
   <main class="citizen-content">
 
+    <!--   -
+         MAIN CONTENT — TWO COLUMNS
+       -->
+    <div class="citizen-columns">
 
-    <!-- =========================
-         ALERT AUTHORITIES
-         + ANNOUNCEMENTS
-    ========================== -->
-    <div class="citizen-grid">
-
+      <div class="citizen-col citizen-col-left">
 
       <!-- ALERT AUTHORITIES -->
       <section class="panel citizen-panel citizen-sos-panel">
@@ -153,7 +156,7 @@
           <div class="panel-heading-text">
 
             <span class="panel-icon" aria-hidden="true">
-              <!-- icon: shield -->
+              <img src="/icons1/shield.svg" alt="" />
             </span>
 
             <div>
@@ -194,6 +197,25 @@
 
         <div class="form-group">
 
+          <label for="sosPhone">
+            Phone number
+            <span class="field-required" aria-hidden="true">*</span>
+          </label>
+
+          <input
+            type="tel"
+            id="sosPhone"
+            placeholder="Your contact number"
+            inputmode="tel"
+            required
+            aria-required="true"
+          >
+
+        </div>
+
+
+        <div class="form-group">
+
           <label for="vulnerability">
             Anyone elderly, disabled, or needing medical attention?
           </label>
@@ -209,6 +231,25 @@
         </div>
 
 
+        <div class="form-group">
+
+          <label for="sosNotes">
+            Add notes
+
+            <span class="field-optional">
+              Optional
+            </span>
+          </label>
+
+          <textarea
+            id="sosNotes"
+            rows="3"
+            placeholder="Anything responders should know — landmarks, injuries, nearby hazards..."
+          ></textarea>
+
+        </div>
+
+
         <button
           type="button"
           class="sos-btn"
@@ -217,7 +258,7 @@
         >
 
           <span class="ui-icon" aria-hidden="true">
-            <!-- icon: send / paper-plane -->
+            <img src="/icons1/send.svg" alt="" />
           </span>
 
           SEND ALERT
@@ -238,86 +279,7 @@
       </section>
 
 
-      <!-- =========================
-           ANNOUNCEMENTS
-      ========================== -->
-      <section class="panel citizen-panel citizen-announcements-panel">
-
-        <div class="panel-heading">
-
-          <div class="panel-heading-text">
-
-            <span class="panel-icon" aria-hidden="true">
-              <!-- icon: megaphone -->
-            </span>
-
-            <div>
-              <div class="panel-eyebrow">
-                LOCAL INFORMATION
-              </div>
-
-              <h2>
-                Announcements
-              </h2>
-            </div>
-
-          </div>
-
-          <div class="panel-heading-note">
-            Stay informed. Stay safe.
-          </div>
-
-        </div>
-
-
-        <div id="announcements">
-          Loading...
-        </div>
-
-        <div
-          class="announcements-pagination"
-          id="announcementsPagination"
-          hidden
-        >
-
-          <button
-            type="button"
-            class="pagination-btn"
-            id="announcementsPrev"
-            aria-label="Previous announcements"
-          >
-            &lsaquo;
-          </button>
-
-          <span
-            class="pagination-status"
-            id="announcementsPageStatus"
-          >
-            1 / 1
-          </span>
-
-          <button
-            type="button"
-            class="pagination-btn"
-            id="announcementsNext"
-            aria-label="Next announcements"
-          >
-            &rsaquo;
-          </button>
-
-        </div>
-
-      </section>
-
-    </div>
-
-
-    <!-- =========================
-         LOST & FOUND
-         + HAZARD REPORT
-    ========================== -->
-    <div class="citizen-grid">
-
+      <!-- LOST & FOUND -->
       <section
         class="panel citizen-panel lostfound-panel"
         id="lostFoundSection"
@@ -328,7 +290,7 @@
           <div class="panel-heading-text">
 
             <span class="panel-icon" aria-hidden="true">
-              <!-- icon: people-search -->
+              <img src="/icons1/people-search.svg" alt="" />
             </span>
 
             <div>
@@ -436,7 +398,7 @@
 
               <label for="lfMedia" class="file-field-trigger">
                 <span class="ui-icon" aria-hidden="true">
-                  <!-- icon: upload -->
+                  <img src="/icons1/upload.svg" alt="" />
                 </span>
                 <span>Choose photo</span>
               </label>
@@ -462,7 +424,7 @@
             onclick="submitLostFound()"
           >
             <span class="ui-icon" aria-hidden="true">
-              <!-- icon: send / paper-plane -->
+              <img src="/icons1/send.svg" alt="" />
             </span>
             Submit Report
           </button>
@@ -500,7 +462,7 @@
               aria-label="Search"
             >
               <span class="ui-icon" aria-hidden="true">
-                <!-- icon: search -->
+                <img src="/icons1/search.svg" alt="" />
               </span>
               Search
             </button>
@@ -566,7 +528,81 @@
 
       </section>
 
+      </div>
 
+      <div class="citizen-col citizen-col-right">
+
+      <!-- ANNOUNCEMENTS -->
+      <section class="panel citizen-panel citizen-announcements-panel">
+
+        <div class="panel-heading">
+
+          <div class="panel-heading-text">
+
+            <span class="panel-icon" aria-hidden="true">
+              <img src="/icons1/megaphone.svg" alt="" />
+            </span>
+
+            <div>
+              <div class="panel-eyebrow">
+                LOCAL INFORMATION
+              </div>
+
+              <h2>
+                Announcements
+              </h2>
+            </div>
+
+          </div>
+
+          <div class="panel-heading-note">
+            Stay informed. Stay safe.
+          </div>
+
+        </div>
+
+
+        <div id="announcements">
+          Loading...
+        </div>
+
+        <div
+          class="announcements-pagination"
+          id="announcementsPagination"
+          hidden
+        >
+
+          <button
+            type="button"
+            class="pagination-btn"
+            id="announcementsPrev"
+            aria-label="Previous announcements"
+          >
+            &lsaquo;
+          </button>
+
+          <span
+            class="pagination-status"
+            id="announcementsPageStatus"
+          >
+            1 / 1
+          </span>
+
+          <button
+            type="button"
+            class="pagination-btn"
+            id="announcementsNext"
+            aria-label="Next announcements"
+          >
+            &rsaquo;
+          </button>
+
+        </div>
+
+      </section>
+
+
+      <!-- HAZARD REPORT -->
       <section
         class="panel citizen-panel hazard-panel"
         id="reportHazardSection"
@@ -577,7 +613,7 @@
           <div class="panel-heading-text">
 
             <span class="panel-icon" aria-hidden="true">
-              <!-- icon: warning-triangle -->
+              <img src="/icons1/warning-triangle.svg" alt="" />
             </span>
 
             <div>
@@ -621,7 +657,7 @@
             >
 
               <span class="ui-icon" aria-hidden="true">
-                <!-- icon: crack -->
+                <img src="/icons1/crack.svg" alt="" />
               </span>
 
               <span>
@@ -639,7 +675,7 @@
             >
 
               <span class="ui-icon" aria-hidden="true">
-                <!-- icon: debris -->
+                <img src="/icons1/debris.svg" alt="" />
               </span>
 
               <span>
@@ -657,7 +693,7 @@
             >
 
               <span class="ui-icon" aria-hidden="true">
-                <!-- icon: road-blocked -->
+                <img src="/icons1/road-blocked.svg" alt="" />
               </span>
 
               <span>
@@ -675,7 +711,7 @@
             >
 
               <span class="ui-icon" aria-hidden="true">
-                <!-- icon: other / more -->
+                <img src="/icons1/more.svg" alt="" />
               </span>
 
               <span>
@@ -703,7 +739,7 @@
               <label for="mediaFile" class="file-field-trigger">
 
                 <span class="ui-icon" aria-hidden="true">
-                  <!-- icon: upload -->
+                  <img src="/icons1/upload.svg" alt="" />
                 </span>
 
                 <span>Choose photo or video</span>
@@ -753,7 +789,7 @@
           >
 
             <span class="ui-icon" aria-hidden="true">
-              <!-- icon: send / paper-plane -->
+              <img src="/icons1/send.svg" alt="" />
             </span>
 
             Submit Hazard Report
@@ -762,7 +798,7 @@
 
           <span class="hazard-submit-note">
             <span class="ui-icon" aria-hidden="true">
-              <!-- icon: info-circle -->
+              <img src="/icons1/info-circle.svg" alt="" />
             </span>
             Your report will be shared with the relevant authorities.
           </span>
@@ -777,14 +813,74 @@
 
       </section>
 
+        <!--   -
+             FIND SHELTER
+            -->
+        <section
+          class="panel citizen-panel shelter-panel"
+          id="findShelterSection"
+        >
+
+          <div class="panel-heading">
+
+            <div class="panel-heading-text">
+
+              <span class="panel-icon" aria-hidden="true">
+                <img src="/icons1/shelter.svg" alt="" />
+              </span>
+
+              <div>
+                <div class="panel-eyebrow">
+                  SAFE HAVENS
+                </div>
+
+                <h2>
+                  Find Shelter
+                </h2>
+              </div>
+
+            </div>
+
+            <div class="panel-heading-note">
+              Elevated relief camps, verified capacity.
+            </div>
+
+          </div>
+
+
+          <div class="shelter-search-row">
+
+            <span class="ui-icon" aria-hidden="true">
+              <img src="/icons1/search.svg" alt="" />
+            </span>
+
+            <input
+              type="search"
+              id="shelterSearch"
+              placeholder="Search by shelter name or district (e.g., Majuli, Silchar)..."
+              autocomplete="off"
+            >
+
+          </div>
+
+
+          <div id="shelterList">
+            Loading...
+          </div>
+
+        </section>
+
+
+      </div>
+
     </div>
 
   </main>
 
 
-  <!-- =========================
+  <!--   -
        DOST ASSISTANCE
-  ========================== -->
+      -->
 
   <aside
     id="dost-panel"
@@ -952,9 +1048,9 @@
   </aside>
 
 
-  <!-- =========================
+  <!--   
        DOST LAUNCHER
-  ========================== -->
+      -->
   <button
     id="dost-open"
     class="dost-open"
@@ -963,16 +1059,16 @@
     aria-expanded="false"
   >
     <span class="ui-icon" aria-hidden="true">
-      <!-- icon: chat-bubble -->
+      <img src="/icons1/chat-bubble.png" alt="" />
     </span>
 
     DOST
   </button>
 
 
-  <!-- =========================
+  <!--   
        SHARED / CITIZEN SCRIPTS
-  ========================== -->
+      -->
 
   <script src="/translations.js"></script>
   <script src="/offline-queue.js"></script>
@@ -981,11 +1077,12 @@
   <script src="/citizen/citizen.js"></script>
   <script src="/citizen/citizen-announcements-pagination.js"></script>
   <script src="/citizen/citizen-lostfound.js"></script>
+  <script src="/citizen/citizen-shelter.js"></script>
 
 
-  <!-- =========================
+  <!--  
        DOST UI LOGIC
-  ========================== -->
+  --->
   <script>
     (function () {
 
@@ -1193,9 +1290,9 @@
   </script>
 
 
-  <!-- =========================
+  <!--   -
        SERVICE WORKER
-  ========================== -->
+     -->
   <script>
 
     if ('serviceWorker' in navigator) {

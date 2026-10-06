@@ -1,10 +1,5 @@
 /* SurakshaNER Research & Inspection Portal
-   Deliberately restrained: scientific workstation, not a marketing dashboard.
-   Same accent language as Citizen/Rescue (pine/ochre/blue/red) so "amber
-   means caution" and "green means complete" hold across the whole site —
-   but its own cooler, neutral background, since a research console
-   reasonably reads a little more clinical than the citizen or rescue
-   portals. Density here is intentional, not a bug to simplify away. */
+     */
 
 :root {
   --research-bg: #eef1ed;
@@ -16,13 +11,12 @@
   --research-text: #1f2b24;
   --research-muted: #5c6b60;
 
-  /* Pine green — same value as Citizen's Alert Authorities panel and
-     Rescue's map/ops panels */
+  
   --research-green: #1e3a30;
   --research-green-dark: #142a22;
   --research-green-soft: #e2e8e4;
 
-  /* Ochre — same family as Citizen/Rescue's amber accents */
+   
   --research-amber: #a97f3d;
   --research-amber-soft: #f1e3c8;
 

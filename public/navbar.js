@@ -6,7 +6,11 @@ function renderNavbar() {
     <div class="tricolor-strip"></div>
     <header class="site-header">
       <div class="brand-wrap">
-        <span class="nav-logo" aria-hidden="true"><!-- icon: mountain-shield --></span>
+        <img
+            src="${base}logo.png"
+            alt="SurakshaNER"
+            class="nav-logo"
+          />
         <div class="brand-block">
           <a href="${base}index.html" class="nav-brand">SurakshaNER</a>
           <div class="nav-tagline">भूस्खलन पूर्व चेतावनी प्रणाली &middot; Disaster Management, NER</div>
@@ -22,9 +26,7 @@ function renderNavbar() {
         <!--<div id="weather-chip" class="weather-chip">Loading weather…</div>-->
         <button id="emergency-btn" class="emergency-btn open-emergency-modal">Emergency Services</button>
         <a href="#" id="download-mobile-btn" class="download-btn">Download for Mobile</a>
-        <div class="lang-toggle" id="lang-toggle">EN&nbsp;|&nbsp;हिं
-          
-        </div>
+        <div class="lang-toggle" id="lang-toggle">EN&nbsp;|&nbsp;অস</div>
       </div>
     </header>
 
@@ -43,14 +45,14 @@ function renderNavbar() {
             <span class="modal-action-title">Report a Hazard</span>
             <span class="modal-action-desc">Upload a photo of cracks, slope movement, or blocked roads</span>
           </a>
-            <div class="modal-action-btn"  id="find-shelter-btn" style="cursor:pointer;">
-              <span class="modal-action-title">Find Shelter</span>
-              <span class="modal-action-desc">See nearest relief points and capacity</span>
-            </div>
-          <!--<a href="${base}citizen/citizen.html#lostFoundSection" class="modal-action-btn">
+          <a href="${base}citizen/citizen.html#findShelterSection" class="modal-action-btn">
+            <span class="modal-action-title">Find Shelter</span>
+            <span class="modal-action-desc">See nearest relief points and capacity</span>
+          </a>
+          <a href="${base}citizen/citizen.html#lostFoundSection" class="modal-action-btn">
             <span class="modal-action-title">Lost &amp; Found</span>
             <span class="modal-action-desc">Report or search for missing people.</span>
-          </a>-->
+          </a>
         </div> 
       </div>
     </div>
@@ -135,18 +137,6 @@ function wireEmergencyModal() {
   const closeBtn = document.getElementById('emergency-close');
   const triggers = document.querySelectorAll('.open-emergency-modal');
 
-  const shelterBtn = document.getElementById('find-shelter-btn');
-  if (shelterBtn) {
-    shelterBtn.addEventListener('click', async () => {
-      const res = await fetch('/api/shelters');
-      const shelters = await res.json();
-      const list = shelters.map(s =>
-        `${s.name}: ${s.current_occupancy}/${s.capacity} occupied`
-      ).join('\n');
-      alert('Nearest Relief Points:\n\n' + list);
-    });
-  }
-  
   if (!modal || !closeBtn) return;
 
   triggers.forEach(btn => {

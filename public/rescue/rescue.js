@@ -27,9 +27,9 @@ const riskColors = { low: '#2ecc71', medium: '#f39c12', high: '#e74c3c' };
 const zoneMarkers = {};
 const zoneData = {};
 
-// ==========================================
+//   
 // RESCUE PORTAL LOCATION SEARCH
-// ==========================================
+//   
 
 const monitoredLocations = {
   guwahati: {

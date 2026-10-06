@@ -47,9 +47,7 @@
     paginate();
   });
 
-  // Re-paginate (from page 1) whenever citizen.js replaces the
-  // announcements list — e.g. on load, or on the socket-driven
-  // `newAnnouncement` refresh.
+   
   const observer = new MutationObserver(() => {
     page = 0;
     paginate();
