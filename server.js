@@ -379,7 +379,9 @@ app.post('/api/demo/reset', (req, res) => {
 
 
 // --- MQTT ingestion (same logic as ingest.js) ---
-const mqttClient = mqtt.connect('mqtt://localhost:1883');
+const mqttClient = mqtt.connect(process.env.MQTT_URL || 'mqtt://localhost:1883', {
+  reconnectPeriod: process.env.MQTT_URL ? 1000 : 0
+});
 
 const insertSensor = db.prepare(`
   INSERT OR IGNORE INTO sensors (id, zone_id, type)
