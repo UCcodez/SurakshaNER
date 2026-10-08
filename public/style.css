@@ -708,3 +708,23 @@ body.portal-landing {
   display: block !important;
   transform: scale(1.15) !important;
 }
+
+
+.portal-icon-community,
+.portal-icon-siren,
+.portal-icon-chart {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.portal-icon-community img,
+.portal-icon-siren img,
+.portal-icon-chart img {
+  display: block;
+  width: 60%;
+  height: 60%;
+  object-fit: contain;
+  opacity: 1;
+  filter: none;
+}
